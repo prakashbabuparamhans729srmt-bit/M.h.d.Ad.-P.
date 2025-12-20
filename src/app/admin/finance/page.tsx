@@ -96,8 +96,8 @@ export default function FinanceManagementPage() {
                     </CardHeader>
                     <CardContent>
                         <ul className="space-y-3">
-                            {transactions.map(tx => (
-                                <li key={tx.id} className="flex justify-between items-center text-sm">
+                            {transactions.map((tx, index) => (
+                                <li key={`${tx.id}-${index}`} className="flex justify-between items-center text-sm">
                                     <div>
                                         <span className="font-medium">{tx.id}:</span> {tx.client}
                                     </div>
