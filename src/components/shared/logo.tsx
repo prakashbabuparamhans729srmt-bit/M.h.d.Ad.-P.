@@ -1,0 +1,16 @@
+import Link from 'next/link';
+import { Network } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+type LogoProps = {
+  className?: string;
+};
+
+export function Logo({ className }: LogoProps) {
+  return (
+    <Link href="/" className={cn("flex items-center gap-2", className)}>
+      <Network className="h-6 w-6 text-primary" />
+      <span className="text-xl font-bold font-headline text-foreground">VyaparSphere</span>
+    </Link>
+  );
+}

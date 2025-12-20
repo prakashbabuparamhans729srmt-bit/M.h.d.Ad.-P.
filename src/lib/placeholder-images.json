@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-image",
+      "description": "Abstract network of nodes and connections representing a business sphere.",
+      "imageUrl": "https://images.unsplash.com/photo-1738082956242-d897b9177bba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhYnN0cmFjdCUyMG5ldHdvcmt8ZW58MHx8fHwxNzY2MTcwMjk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract network"
+    },
+    {
+      "id": "avatar-1",
+      "description": "Avatar of a smiling woman.",
+      "imageUrl": "https://images.unsplash.com/photo-1557053910-d9eadeed1c58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2NjE4MTQ3NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Avatar of a man with glasses.",
+      "imageUrl": "https://images.unsplash.com/photo-1594672830234-ba4cfe1202dc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFuJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzY2MTU2NDU1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "avatar-3",
+      "description": "Avatar of a professional-looking person.",
+      "imageUrl": "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjYxNzYyODF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "blog-post-1",
+      "description": "Image for a blog post about digital transformation.",
+      "imageUrl": "https://images.unsplash.com/photo-1548092372-0d1bd40894a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxkaWdpdGFsJTIwdGVjaG5vbG9neXxlbnwwfHx8fDE3NjYyMTMxMzl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "digital technology"
+    },
+    {
+      "id": "blog-post-2",
+      "description": "Image for a blog post about market growth.",
+      "imageUrl": "https://images.unsplash.com/photo-1621629057099-c7cf1fb8ca1e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFya2V0JTIwY2hhcnR8ZW58MHx8fHwxNzY2MTY5NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "market chart"
+    },
+    {
+      "id": "blog-post-3",
+      "description": "Image for a blog post about client collaboration.",
+      "imageUrl": "https://images.unsplash.com/photo-1568992687947-868a62a9f521?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx0ZWFtJTIwbWVldGluZ3xlbnwwfHx8fDE3NjYxNzIzNjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "team meeting"
+    },
+    {
+      "id": "user-nav-avatar",
+      "description": "Avatar for the logged-in user navigation menu.",
+      "imageUrl": "https://images.unsplash.com/photo-1750535135659-7a0c8878a8fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGVyc29uJTIwYXZhdGFyfGVufDB8fHx8MTc2NjE1NDIxOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    }
+  ]
 }
