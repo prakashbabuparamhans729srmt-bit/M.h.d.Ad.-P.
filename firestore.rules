@@ -1,0 +1,170 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model for all
+ * private data, ensuring that users can only access their own information. Publicly
+ * accessible content, such as blog posts and landing pages, is globally readable
+ * but has tightly controlled write access, typically restricted to the original author.
+ *
+ * Data Structure: User-specific data is hierarchically organized under the /users/{userId}
+ * path. This includes user profiles, projects, and all project-related sub-collections
+ * like files and summaries. Public content resides in top-level collections like
+ * /blogPosts and /landingPages, separating it from private user data.
+ *
+ * Key Security Decisions:
+ * - User Enumeration is disallowed by preventing `list` operations on the top-level /users collection.
+ * - All data within a user's path (/users/{userId}/...) is private to that user.
+ * - Public collections are read-only for anonymous and authenticated users.
+ * - Write access to public content is granted only to authenticated authors of that content.
+ * - The default security posture is to deny access unless explicitly allowed.
+ *
+ * Denormalization for Authorization: The rules rely on path-based authorization
+ * (e.g., matching {userId} in the path to the authenticated user's UID) to avoid
+ * costly and slow `get()` calls. For top-level collections like /blogPosts, an `authorId`
+ * field is denormalized onto each document to enable simple and performant ownership checks.
+ *
+ * Structural Segregation: Private user data (projects, files) is kept in a user-scoped
+ * subcollection, while public data (blog posts) is in a separate top-level collection.
+ * This separation simplifies rules, enhances security for list queries, and improves performance.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    // --------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     * This is the primary function for enforcing data ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks for ownership on an existing document. Used for update and delete operations
+     * to ensure the document exists before attempting to modify it.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * Validates that a user is creating their own user document and that the
+     * document's internal 'id' field matches the user's UID for data integrity.
+     */
+    function isCreatingSelf(userId) {
+      return isOwner(userId) && request.resource.data.id == userId;
+    }
+
+    /**
+     * Validates that a user is updating their own document and that the 'id' field,
+     * which links the document to the user, remains unchanged.
+     */
+    function isUpdatingOwnImmutableData(userId) {
+      // The `resource` variable is guaranteed to be non-null by the calling rule.
+      return isOwner(userId) && request.resource.data.id == resource.data.id;
+    }
+
+    // Collection Rules
+    // --------------------------------
+
+    /**
+     * @description Manages user profile documents.
+     * @path /users/{userId}
+     * @allow (create) An authenticated user creating their own profile document for the first time.
+     * @deny (list) Any user, authenticated or not, attempting to list all user profiles.
+     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isCreatingSelf(userId);
+      allow update: if isExistingOwner(userId) && isUpdatingOwnImmutableData(userId);
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Manages projects owned by a specific client (user).
+       * @path /users/{clientId}/projects/{projectId}
+       * @allow (get) The client whose UID is {clientId} reading their own project.
+       * @deny (create) An authenticated user trying to create a project under another user's profile.
+       * @principle Enforces path-based ownership for nested user data.
+       */
+      match /projects/{projectId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Manages files within a specific project.
+         * @path /users/{clientId}/projects/{projectId}/files/{fileId}
+         * @allow (list) The client whose UID is {clientId} listing all files for their project.
+         * @deny (get) Any other user trying to read a file from a project they do not own.
+         * @principle Inherits ownership from the parent document's path.
+         */
+        match /files/{fileId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && request.resource.data.projectId == projectId;
+          allow update: if isExistingOwner(userId) && request.resource.data.projectId == resource.data.projectId;
+          allow delete: if isExistingOwner(userId);
+        }
+
+        /**
+         * @description Manages timeline summaries for a project.
+         * @path /users/{clientId}/projects/{projectId}/timelineSummaries/{timelineSummaryId}
+         * @allow (create) The client whose UID is {clientId} creating a new summary for their project.
+         * @deny (delete) Any other user trying to delete a summary from a project they do not own.
+         * @principle Inherits ownership from the parent document's path.
+         */
+        match /timelineSummaries/{timelineSummaryId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && request.resource.data.projectId == projectId;
+          allow update: if isExistingOwner(userId) && request.resource.data.projectId == resource.data.projectId;
+          allow delete: if isExistingOwner(userId);
+        }
+      }
+    }
+
+    /**
+     * @description Manages public blog posts. Anyone can read, but only authors can write.
+     * @path /blogPosts/{blogPostId}
+     * @allow (get) Any user, authenticated or not, reading a blog post.
+     * @deny (update) An authenticated user trying to modify a blog post written by someone else.
+     * @principle Implements a "Public Read with Owner-Only Writes" pattern using a denormalized authorId.
+     */
+    match /blogPosts/{blogPostId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if resource != null && isOwner(resource.data.authorId) && request.resource.data.authorId == resource.data.authorId;
+      allow delete: if resource != null && isOwner(resource.data.authorId);
+    }
+
+    /**
+     * @description Manages public landing pages. Anyone can read them. Writes are currently disabled.
+     * @path /landingPages/{landingPageId}
+     * @allow (list) Any user, authenticated or not, listing all landing pages.
+     * @deny (create) Any user trying to create a new landing page.
+     * @principle Implements a "Public Read" pattern. Writes are disabled pending schema changes.
+     */
+    match /landingPages/{landingPageId} {
+      allow get: if true;
+      allow list: if true;
+      // CRITICAL: Cannot implement owner-only writes. The 'LandingPage' entity is missing an 'ownerId' or 'authorId' field.
+      // Writes are disabled until the schema is updated to include an ownership field.
+      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+  }
+}

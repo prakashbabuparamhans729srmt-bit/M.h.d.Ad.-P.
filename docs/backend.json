@@ -1,0 +1,352 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the VyaparSphere platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user (e.g., admin, client)."
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "role"
+      ]
+    },
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
+      "type": "object",
+      "description": "Represents a project managed within VyaparSphere.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the project entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the project."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the project."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The start date of the project.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The planned end date of the project.",
+          "format": "date-time"
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Reference to User (Client). (Relationship: User 1:N Project)",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "startDate",
+        "endDate",
+        "clientId"
+      ]
+    },
+    "File": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "File",
+      "type": "object",
+      "description": "Represents a file associated with a project.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the file entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the file."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL where the file is stored.",
+          "format": "uri"
+        },
+        "projectId": {
+          "type": "string",
+          "description": "Reference to Project. (Relationship: Project 1:N File)",
+          "format": "uuid"
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "The date and time the file was uploaded.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "url",
+        "projectId",
+        "uploadDate"
+      ]
+    },
+    "TimelineSummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TimelineSummary",
+      "type": "object",
+      "description": "Represents a summarized timeline update for a project.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the timeline summary entity."
+        },
+        "projectId": {
+          "type": "string",
+          "description": "Reference to Project. (Relationship: Project 1:N TimelineSummary)"
+        },
+        "summary": {
+          "type": "string",
+          "description": "The summarized timeline update."
+        },
+        "generatedDate": {
+          "type": "string",
+          "description": "The date the timeline summary was generated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "summary",
+        "generatedDate"
+      ]
+    },
+    "BlogPost": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BlogPost",
+      "type": "object",
+      "description": "Represents a blog post or news article within the CMS.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the blog post entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the blog post."
+        },
+        "content": {
+          "type": "string",
+          "description": "The main content of the blog post."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to User (Author). (Relationship: User 1:N BlogPost)"
+        },
+        "publicationDate": {
+          "type": "string",
+          "description": "The date the blog post was published.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "authorId",
+        "publicationDate"
+      ]
+    },
+    "LandingPage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LandingPage",
+      "type": "object",
+      "description": "Represents a landing page for special offers and promotions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the landing page."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the landing page."
+        },
+        "content": {
+          "type": "string",
+          "description": "The main content of the landing page."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL of the landing page.",
+          "format": "uri"
+        },
+        "creationDate": {
+          "type": "string",
+          "description": "The date the landing page was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "url",
+        "creationDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Uses path-based ownership for user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{clientId}/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores projects associated with a client. Uses path-based ownership.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier of the client (user)."
+            },
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{clientId}/projects/{projectId}/files/{fileId}",
+        "definition": {
+          "entityName": "File",
+          "schema": {
+            "$ref": "#/backend/entities/File"
+          },
+          "description": "Stores files related to a specific project. Inherits project-level ownership.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier of the client (user)."
+            },
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            },
+            {
+              "name": "fileId",
+              "description": "The unique identifier of the file."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{clientId}/projects/{projectId}/timelineSummaries/{timelineSummaryId}",
+        "definition": {
+          "entityName": "TimelineSummary",
+          "schema": {
+            "$ref": "#/backend/entities/TimelineSummary"
+          },
+          "description": "Stores timeline summaries for a project. Inherits project-level ownership.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier of the client (user)."
+            },
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            },
+            {
+              "name": "timelineSummaryId",
+              "description": "The unique identifier of the timeline summary."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/blogPosts/{blogPostId}",
+        "definition": {
+          "entityName": "BlogPost",
+          "schema": {
+            "$ref": "#/backend/entities/BlogPost"
+          },
+          "description": "Stores blog posts.  Uses structural segregation to allow for different security rules.",
+          "params": [
+            {
+              "name": "blogPostId",
+              "description": "The unique identifier of the blog post."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/landingPages/{landingPageId}",
+        "definition": {
+          "entityName": "LandingPage",
+          "schema": {
+            "$ref": "#/backend/entities/LandingPage"
+          },
+          "description": "Stores landing pages. Uses structural segregation to allow for different security rules.",
+          "params": [
+            {
+              "name": "landingPageId",
+              "description": "The unique identifier of the landing page."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the VyaparSphere application. We prioritize path-based ownership for user-specific data and membership maps for collaborative data. Denormalization is used extensively to avoid `get()` calls in security rules, and structural segregation ensures homogeneous security postures within collections. The structure supports the required QAPs via segregation of content (e.g., public blog posts vs. user-specific projects) and using membership maps for project access control.\n\nSpecifically:\n\n*   **Users:** User data is stored in `/users/{userId}` using path-based ownership. This enables simple security rules based on `request.auth.uid`.\n*   **Projects:** Projects are stored under `/users/{clientId}/projects/{projectId}`, reflecting the 1:N relationship between users (as clients) and projects. This utilizes path-based ownership and simplifies access control.\n*   **Files:** Files are stored under `/users/{clientId}/projects/{projectId}/files/{fileId}`, maintaining the hierarchical structure and enabling straightforward security rules based on project ownership.\n*   **Timeline Summaries:** Timeline summaries are stored under `/users/{clientId}/projects/{projectId}/timelineSummaries/{timelineSummaryId}`, following the project hierarchy for easy management and security.\n*   **Blog Posts:** Blog posts are stored in a top-level `/blogPosts/{blogPostId}` collection. This segregation allows for different security rules (e.g., public read access, restricted write access).\n*   **Landing Pages:** Landing pages are stored in a top-level `/landingPages/{landingPageId}` collection, similar to blog posts, enabling distinct access controls.\n\nThis design ensures that access control can be implemented efficiently using Firestore security rules without relying on complex `get()` calls, thereby enhancing security, scalability, and debuggability."
+  }
+}
