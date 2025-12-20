@@ -5,7 +5,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, Users, Briefcase, Settings, LifeBuoy } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, Settings, LifeBuoy, Wallet } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
@@ -13,6 +13,7 @@ const menuItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/users', label: 'User Management', icon: Users },
   { href: '/admin/projects', label: 'Project Oversight', icon: Briefcase },
+  { href: '/admin/finance', label: 'Financials', icon: Wallet },
   { href: '#', label: 'System Settings', icon: Settings },
 ];
 
