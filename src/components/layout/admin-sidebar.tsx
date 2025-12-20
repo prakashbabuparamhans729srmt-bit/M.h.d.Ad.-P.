@@ -15,7 +15,7 @@ const menuItems = [
   { href: '/admin/projects', label: 'Project Oversight', icon: Briefcase },
   { href: '/admin/finance', label: 'Financials', icon: Wallet },
   { href: '/admin/analytics', label: 'Analytics', icon: TrendingUp },
-  { href: '#', label: 'System Settings', icon: Settings },
+  { href: '/admin/settings', label: 'System Settings', icon: Settings },
 ];
 
 export function AdminSidebar() {
