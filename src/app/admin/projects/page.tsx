@@ -67,6 +67,8 @@ export default function AdminProjectsPage() {
                     <TableHead>Client</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Progress</TableHead>
+                    <TableHead>Budget</TableHead>
+                    <TableHead>Deadline</TableHead>
                     <TableHead>
                       <span className="sr-only">Actions</span>
                     </TableHead>
@@ -88,6 +90,8 @@ export default function AdminProjectsPage() {
                           <span>{project.progress}%</span>
                         </div>
                       </TableCell>
+                      <TableCell>₹{project.progress * 1000}</TableCell>
+                      <TableCell>{project.endDate}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
