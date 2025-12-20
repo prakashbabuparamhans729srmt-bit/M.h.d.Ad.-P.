@@ -1,8 +1,10 @@
 export const navLinks = [
   { href: '/', label: 'Home' },
+  { href: '/about', label: 'About Us' },
   { href: '/blog', label: 'Blog' },
   { href: '/#features', label: 'Features' },
   { href: '/#testimonials', label: 'Testimonials' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export const userList = [
