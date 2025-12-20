@@ -14,7 +14,6 @@ import { Logo } from '@/components/shared/logo';
 import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
@@ -27,7 +26,6 @@ export default function LoginPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoginFormInputs>({
@@ -53,18 +51,8 @@ export default function LoginPage() {
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsSubmitting(true);
-    try {
-      // We are not awaiting this, the onAuthStateChanged in the provider will handle the redirect
-      initiateEmailSignIn(auth, data.email, data.password);
-    } catch (error: any) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: error.message || 'An unexpected error occurred.',
-      });
-      setIsSubmitting(false);
-    }
+    // We are not awaiting this, the onAuthStateChanged in the provider will handle the redirect
+    initiateEmailSignIn(auth, data.email, data.password);
   };
 
   if (isUserLoading || user) {
