@@ -69,13 +69,13 @@ export const blogPosts = [
 
 export const testimonials = [
   {
-    quote: "VyaparSphere transformed our project management. The client portal is intuitive and keeps us updated in real-time. Their team's professionalism is second to none.",
+    quote: "VyaparSphere transformed our project management. The client portal is intuitive and keeps us updated in real-time. Their team\'s professionalism is second to none.",
     name: "Priya Patel",
     title: "CEO, InnovateNow",
     imageId: "avatar-1",
   },
   {
-    quote: "The AI timeline summarization is a game-changer. I can get a quick overview of our project's progress without digging through documents. Highly recommended!",
+    quote: "The AI timeline summarization is a game-changer. I can get a quick overview of our project\'s progress without digging through documents. Highly recommended!",
     name: "Rohan Gupta",
     title: "Founder, HealthFirst",
     imageId: "avatar-2",
@@ -86,4 +86,21 @@ export const testimonials = [
     title: "Marketing Director, Global Exports",
     imageId: "avatar-3",
   },
+];
+
+export const projectFiles = [
+  { id: 'file-01', name: 'Project Brief.pdf', type: 'PDF', size: '2.5 MB', uploaded: '2024-03-01', projectId: 'proj-001' },
+  { id: 'file-02', name: 'Wireframes_v2.fig', type: 'Figma', size: '15.2 MB', uploaded: '2024-03-10', projectId: 'proj-001' },
+  { id: 'file-03', name: 'Technical_Spec.docx', type: 'Word', size: '1.1 MB', uploaded: '2024-03-15', projectId: 'proj-001' },
+  { id: 'file-04', name: 'Marketing_Assets.zip', type: 'ZIP', size: '58.9 MB', uploaded: '2024-04-05', projectId: 'proj-004' },
+  { id: 'file-05', name: 'Final_Report.pdf', type: 'PDF', size: '10.8 MB', uploaded: '2024-02-20', projectId: 'proj-002' },
+  { id: 'file-06', name: 'Initial_Mockups.png', type: 'PNG', size: '4.3 MB', uploaded: '2024-05-01', projectId: 'proj-003' },
+];
+
+export const invoices = [
+  { id: 'INV-2024-001', project: 'E-commerce Platform Development', amount: '₹1,50,000', status: 'Paid', issueDate: '2024-03-01', dueDate: '2024-03-15' },
+  { id: 'INV-2024-002', project: 'E-commerce Platform Development', amount: '₹2,00,000', status: 'Paid', issueDate: '2024-04-01', dueDate: '2024-04-15' },
+  { id: 'INV-2024-003', project: 'E-commerce Platform Development', amount: '₹1,75,000', status: 'Pending', issueDate: '2024-05-01', dueDate: '2024-05-15' },
+  { id: 'INV-2024-004', project: 'Mobile App for Healthcare', amount: '₹3,50,000', status: 'Paid', issueDate: '2024-02-10', dueDate: '2024-02-25' },
+  { id: 'INV-2024-005', project: 'Marketing Campaign Landing Pages', amount: '₹75,000', status: 'Due', issueDate: '2024-04-20', dueDate: '2024-05-05' },
 ];

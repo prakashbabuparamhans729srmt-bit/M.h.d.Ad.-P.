@@ -5,14 +5,15 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, Briefcase, FileText, MessageSquare, LifeBuoy } from 'lucide-react';
+import { LayoutDashboard, Briefcase, FileText, MessageSquare, LifeBuoy, Wallet } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const menuItems = [
   { href: '/client/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/client/projects', label: 'Projects', icon: Briefcase },
-  { href: '#', label: 'Files', icon: FileText },
+  { href: '/client/files', label: 'Files', icon: FileText },
+  { href: '/client/billing', label: 'Billing', icon: Wallet },
   { href: '#', label: 'Communication', icon: MessageSquare },
 ];
 
