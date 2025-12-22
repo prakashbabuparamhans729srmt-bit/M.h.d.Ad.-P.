@@ -37,10 +37,10 @@ export function FloatingSupportWidget() {
       <DialogTrigger asChild>
         <Button
           size="icon"
-          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-50"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
           aria-label="Open support chat"
         >
-          <LifeBuoy className="h-8 w-8" />
+          <LifeBuoy className="h-7 w-7" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md fixed bottom-24 right-6 z-50">
