@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/shared/logo';
 import { UserNav } from '@/components/shared/user-nav';
+import { FloatingSupportWidget } from '../shared/floating-support-widget';
 
 type PortalLayoutProps = {
   sidebarContent: ReactNode;
@@ -38,6 +39,7 @@ export function PortalLayout({ sidebarContent, children }: PortalLayoutProps) {
           </header>
           <main className="flex-1 p-4 md:p-6">{children}</main>
         </SidebarInset>
+        <FloatingSupportWidget />
       </div>
     </SidebarProvider>
   );
