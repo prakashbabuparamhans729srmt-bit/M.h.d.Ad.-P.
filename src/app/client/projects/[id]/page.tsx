@@ -19,8 +19,8 @@ export default function ProjectPage({ params }: ProjectPageProps) {
   }
 
   return (
-    <div className="grid gap-8">
-      <header>
+    <div className="grid max-w-4xl mx-auto gap-6">
+      <header className="mb-4">
         <div className="flex items-center gap-4">
           <h1 className="text-3xl font-bold font-headline">{project.name}</h1>
           <Badge variant={project.status === 'Completed' ? 'default' : 'secondary'}>{project.status}</Badge>
