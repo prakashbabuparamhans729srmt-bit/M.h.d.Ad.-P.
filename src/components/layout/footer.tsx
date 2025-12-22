@@ -4,7 +4,7 @@ import { navLinks } from '@/lib/placeholder-data';
 
 export function Footer() {
   return (
-    <footer className="border-t bg-card">
+    <footer className="border-t border-white/10 bg-card">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex flex-col gap-4 items-start">
@@ -56,7 +56,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-12 pt-8 border-t">
+        <div className="mt-12 pt-8 border-t border-white/10">
           <p className="text-center text-sm text-muted-foreground">
             © {new Date().getFullYear()} VyaparSphere. All rights reserved.
           </p>

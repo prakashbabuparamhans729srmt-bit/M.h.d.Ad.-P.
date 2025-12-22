@@ -7,16 +7,19 @@ export function HeroSection() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'hero-image');
 
   return (
-    <section className="relative w-full py-20 md:py-32 bg-card">
-      {heroImage && (
-        <Image
-          src={heroImage.imageUrl}
-          alt={heroImage.description}
-          fill
-          className="object-cover opacity-5"
-          data-ai-hint={heroImage.imageHint}
-          priority
-        />
+    <section className="relative w-full py-20 md:py-32">
+       {heroImage && (
+        <div className="absolute inset-0 bg-black">
+          <Image
+            src={heroImage.imageUrl}
+            alt={heroImage.description}
+            fill
+            className="object-cover opacity-20"
+            data-ai-hint={heroImage.imageHint}
+            priority
+          />
+           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background to-background" />
+        </div>
       )}
       <div className="container relative z-10">
         <div className="max-w-3xl text-center mx-auto">

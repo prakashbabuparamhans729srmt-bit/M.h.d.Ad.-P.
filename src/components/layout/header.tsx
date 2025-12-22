@@ -13,7 +13,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
         <Logo />
         <nav className="hidden md:flex items-center gap-6 ml-10 text-sm font-medium">
