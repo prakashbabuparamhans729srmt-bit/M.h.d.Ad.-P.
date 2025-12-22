@@ -20,8 +20,7 @@ type PortalLayoutProps = {
 export function PortalLayout({ sidebarContent, children }: PortalLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
-        <Sidebar>
+        <Sidebar collapsible="icon">
           <SidebarHeader>
             <Logo />
           </SidebarHeader>
@@ -30,19 +29,16 @@ export function PortalLayout({ sidebarContent, children }: PortalLayoutProps) {
             {/* Can add footer content here if needed */}
           </SidebarFooter>
         </Sidebar>
-        <div className="flex-1">
-          <SidebarInset>
-            <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-              <SidebarTrigger className="md:hidden" />
-              <div className="flex-1 text-right">
-                <UserNav />
-              </div>
-            </header>
-            <main className="flex-1 p-4 md:p-6">{children}</main>
-          </SidebarInset>
-        </div>
-        <FloatingSupportWidget />
-      </div>
+        <SidebarInset>
+          <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+            <SidebarTrigger className="md:flex hidden" />
+            <div className="flex-1 text-right">
+              <UserNav />
+            </div>
+          </header>
+          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <FloatingSupportWidget />
+        </SidebarInset>
     </SidebarProvider>
   );
 }

@@ -30,6 +30,7 @@ export function AdminSidebar() {
               asChild
               isActive={pathname.startsWith(item.href)}
               tooltip={item.label}
+              title={item.label}
             >
               <Link href={item.href}>
                 <item.icon />
@@ -41,7 +42,7 @@ export function AdminSidebar() {
       </SidebarMenu>
       <SidebarMenu className="mt-auto">
         <SidebarMenuItem>
-          <SidebarMenuButton asChild tooltip="Support">
+          <SidebarMenuButton asChild tooltip="Support" title="Support">
             <Link href="#">
               <LifeBuoy />
               <span>Support</span>

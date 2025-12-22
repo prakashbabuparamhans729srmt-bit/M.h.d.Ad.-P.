@@ -4,9 +4,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import { LayoutDashboard, Briefcase, FileText, MessageSquare, LifeBuoy } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -31,6 +28,7 @@ export function ClientSidebar() {
               asChild
               isActive={pathname.startsWith(item.href)}
               tooltip={item.label}
+              title={item.label}
             >
               <Link href={item.href}>
                 <item.icon />
@@ -42,7 +40,7 @@ export function ClientSidebar() {
       </SidebarMenu>
       <SidebarMenu className="mt-auto">
         <SidebarMenuItem>
-          <SidebarMenuButton asChild tooltip="Support">
+          <SidebarMenuButton asChild tooltip="Support" title="Support">
             <Link href="#">
               <LifeBuoy />
               <span>Support</span>
