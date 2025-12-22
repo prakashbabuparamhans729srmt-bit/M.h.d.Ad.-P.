@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Header } from './header';
 import { Footer } from './footer';
+import { FloatingSupportWidget } from '../shared/floating-support-widget';
 
 type PublicLayoutProps = {
   children: ReactNode;
@@ -12,6 +13,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <FloatingSupportWidget />
     </div>
   );
 }
