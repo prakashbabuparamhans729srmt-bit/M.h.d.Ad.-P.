@@ -26,7 +26,7 @@ export function ClientSidebar() {
           <SidebarMenuItem key={item.label}>
             <SidebarMenuButton
               asChild
-              isActive={pathname.startsWith(item.href)}
+              isActive={pathname.startsWith(item.href) && item.href !== '#'}
               tooltip={item.label}
               title={item.label}
             >
