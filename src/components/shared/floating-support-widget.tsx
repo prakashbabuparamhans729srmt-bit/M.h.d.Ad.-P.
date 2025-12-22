@@ -30,6 +30,11 @@ export function FloatingSupportWidget() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -78,6 +83,10 @@ export function FloatingSupportWidget() {
       setIsLoading(false);
     }
   };
+  
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
