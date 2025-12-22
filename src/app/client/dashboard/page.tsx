@@ -1,10 +1,11 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, MessageSquare, FileText, Activity } from 'lucide-react';
 
 export default function ClientDashboardPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold font-headline mb-6">Client Dashboard</h1>
+    <div className="grid gap-6">
+      <h1 className="text-3xl font-bold font-headline">Client Dashboard</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -48,16 +49,14 @@ export default function ClientDashboardPage() {
         </Card>
       </div>
 
-      <div className="mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Project Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">A chart displaying project progress will be shown here.</p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">A chart displaying project progress will be shown here.</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

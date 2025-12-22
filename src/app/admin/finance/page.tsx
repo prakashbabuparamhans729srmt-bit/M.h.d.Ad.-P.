@@ -20,7 +20,7 @@ const transactions = [
     { id: '#EXP-0423', client: 'सर्वर होस्टिंग', amount: '₹25,000', status: 'paid' },
     { id: '#INV-1067', client: 'सीमा टेक', amount: '₹25,000', status: 'paid' },
     { id: '#TAX-0424', client: 'GST भुगतान', amount: '₹1,45,000', status: 'paid' },
-    { id: '#INV-1089', client: 'अमित स्टोर्स', amount: '₹45,000', status: 'due' },
+    { id: '#INV-1089-2', client: 'अमित स्टोर्स', amount: '₹45,000', status: 'due' },
 ];
 
 const bankAccounts = [

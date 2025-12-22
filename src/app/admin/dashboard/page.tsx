@@ -1,13 +1,14 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Briefcase, DollarSign, TrendingUp, AlertTriangle, HeartPulse, Activity } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function AdminDashboardPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold font-headline mb-6">मास्टर एडमिन पैनल</h1>
+    <div className="grid gap-6">
+      <h1 className="text-3xl font-bold font-headline">मास्टर एडमिन पैनल</h1>
 
-      <Card className="mb-6">
+      <Card>
         <CardHeader>
           <CardTitle>सिस्टम ओवरव्यू</CardTitle>
         </CardHeader>
@@ -75,7 +76,7 @@ export default function AdminDashboardPage() {
         </CardContent>
       </Card>
       
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3 mb-6">
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><AlertTriangle className="text-destructive h-5 w-5" /> क्रिटिकल अलर्ट्स</CardTitle>
