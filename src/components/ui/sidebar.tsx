@@ -585,6 +585,13 @@ const SidebarMenuButton = React.forwardRef<
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
 
+    const buttonContent =
+      state === "collapsed"
+        ? React.Children.map(children, (child) =>
+            React.isValidElement(child) && child.type === "span" ? null : child
+          )
+        : children
+
     const button = (
       <Comp
         ref={ref}
@@ -594,20 +601,12 @@ const SidebarMenuButton = React.forwardRef<
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
       >
-        {children}
+        {buttonContent}
       </Comp>
     )
-
+    
     if (!tooltip) {
-        return React.cloneElement(
-            button,
-            {},
-            React.Children.map(children, (child) =>
-              (React.isValidElement(child) && child.type === 'span' && state === 'collapsed')
-                ? null
-                : child
-            )
-          );
+        return button;
     }
     
     if (typeof tooltip === 'string') {
