@@ -155,10 +155,7 @@ const SidebarProvider = React.forwardRef<
                 ...style,
               } as React.CSSProperties
             }
-            className={cn(
-              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
-              className
-            )}
+            className={cn("flex w-full min-h-screen", className)}
             ref={ref}
             {...props}
           >
@@ -229,6 +226,8 @@ const Sidebar = React.forwardRef<
       )
     }
 
+    const isExpanded = state === 'expanded';
+
     return (
       <div
         ref={ref}
@@ -236,7 +235,7 @@ const Sidebar = React.forwardRef<
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
           "group peer hidden md:block text-sidebar-foreground",
-           !open && collapsible === "icon" && "w-[--sidebar-width-icon]"
+           !isExpanded && collapsible === "icon" && "w-[--sidebar-width-icon]"
         )}
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
@@ -247,8 +246,8 @@ const Sidebar = React.forwardRef<
         <div
           className={cn(
             "duration-200 relative h-svh bg-transparent transition-[width] ease-linear",
-            !open && "w-[var(--sidebar-width-icon)]",
-            open && "w-[var(--sidebar-width)]",
+            !isExpanded && "w-[var(--sidebar-width-icon)]",
+            isExpanded && "w-[var(--sidebar-width)]",
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
@@ -259,8 +258,8 @@ const Sidebar = React.forwardRef<
         <div
           className={cn(
             "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] ease-linear md:flex",
-            !open && "w-[var(--sidebar-width-icon)]",
-            open && "w-[var(--sidebar-width)]",
+            !isExpanded && "w-[var(--sidebar-width-icon)]",
+            isExpanded && "w-[var(--sidebar-width)]",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -380,12 +379,12 @@ const SidebarHeader = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
 >(({ className, ...props }, ref) => {
-    const { open } = useSidebar();
+    const { state } = useSidebar();
   return (
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2",  !open && "p-0", className)}
+      className={cn("flex flex-col gap-2 p-2",  state === 'collapsed' && "p-0", className)}
       {...props}
     />
   )
@@ -426,14 +425,14 @@ const SidebarContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
 >(({ className, ...props }, ref) => {
-    const { open } = useSidebar();
+    const { state } = useSidebar();
   return (
     <div
       ref={ref}
       data-sidebar="content"
       className={cn(
         "flex min-h-0 flex-1 flex-col gap-2 overflow-auto",
-        !open && "overflow-hidden",
+        state === 'collapsed' && "overflow-hidden",
         className
       )}
       {...props}
@@ -584,7 +583,7 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
-    const { isMobile, state, open } = useSidebar()
+    const { isMobile, state } = useSidebar()
 
     const button = (
       <Comp
@@ -596,18 +595,19 @@ const SidebarMenuButton = React.forwardRef<
         {...props}
       >
         {children}
-        <span className={cn('inline-block', !open && 'hidden')}>{props.title}</span>
       </Comp>
     )
 
     if (!tooltip) {
-      return React.cloneElement(button, {}, 
-        React.Children.map(children, child =>
-          React.isValidElement(child) && child.type === 'span' && !open
-            ? null
-            : child
-        )
-      );
+        return React.cloneElement(
+            button,
+            {},
+            React.Children.map(children, (child) =>
+              (React.isValidElement(child) && child.type === 'span' && state === 'collapsed')
+                ? null
+                : child
+            )
+          );
     }
     
     if (typeof tooltip === 'string') {
