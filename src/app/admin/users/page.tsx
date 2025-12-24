@@ -41,13 +41,13 @@ export default function AdminUsersPage() {
       </CardHeader>
       <CardContent>
         <div className="mb-6">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="relative flex-1 w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search by name, email, or role..." className="pl-10" />
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">Filter by:</span>
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-sm font-medium shrink-0">Filter by:</span>
               <div className="flex items-center space-x-2">
                 <Checkbox id="filter-admin" />
                 <Label htmlFor="filter-admin" className="text-sm font-normal">Admin</Label>
@@ -87,7 +87,7 @@ export default function AdminUsersPage() {
                   <Badge variant={user.status === 'Active' ? 'default' : 'destructive'}>{user.status}</Badge>
                 </TableCell>
                 <TableCell>
-                  {new Date().toLocaleDateString()}
+                  2023-05-2{user.id}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -120,7 +120,7 @@ export default function AdminUsersPage() {
                 <PaginationLink href="#">1</PaginationLink>
               </PaginationItem>
               <PaginationItem>
-                <PaginationLink href="#" isActive>
+                <PaginationLink href="#">
                   2
                 </PaginationLink>
               </PaginationItem>
