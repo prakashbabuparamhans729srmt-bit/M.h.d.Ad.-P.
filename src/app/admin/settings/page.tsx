@@ -24,7 +24,7 @@ import {
   FileText,
   GitBranch,
   Rocket,
-  ClipboardList
+  Clipboard
 } from 'lucide-react';
 
 const healthData = [
@@ -160,7 +160,7 @@ export default function SettingsPage() {
                 <li className="flex items-center gap-2 cursor-pointer hover:text-primary"><HeartPulse size={16} /> परफॉर्मेंस मॉनिटर</li>
                 <li className="flex items-center gap-2 cursor-pointer hover:text-primary"><FileText size={16} /> एरर लॉग्स</li>
                 <li className="flex items-center gap-2 cursor-pointer hover:text-primary"><ShieldCheck size={16} /> सिक्योरिटी स्कैन</li>
-                <li className="flex items-center gap-2 cursor-pointer hover:text-primary"><ClipboardList size={16} /> ऑडिट ट्रेल</li>
+                <li className="flex items-center gap-2 cursor-pointer hover:text-primary"><Clipboard size={16} /> ऑडिट ट्रेल</li>
                 <li className="flex items-center gap-2 cursor-pointer hover:text-primary"><Trash2 size={16} /> डेटा क्लीनअप</li>
                 <li className="flex items-center gap-2 cursor-pointer hover:text-primary"><Rocket size={16} /> हेल्थ चेक</li>
              </ul>
