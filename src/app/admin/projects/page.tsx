@@ -1,10 +1,10 @@
+'use client';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { projectList } from '@/lib/placeholder-data';
-import { MoreHorizontal, PlusCircle, Search, FileDown, CalendarClock } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Search, FileDown, CalendarClock, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
   DropdownMenu,
@@ -17,14 +17,35 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, collectionGroup, query } from 'firebase/firestore';
 
 export default function AdminProjectsPage() {
   const projectStatuses = ['Planning', 'Design', 'Development', 'Testing', 'Completed', 'On Hold'];
+  const firestore = useFirestore();
+
+  const allProjectsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collectionGroup(firestore, 'projects'));
+  }, [firestore]);
+
+  const { data: allProjects, isLoading: isLoadingProjects } = useCollection(allProjectsQuery);
+  
   const upcomingDeadlines = [
     { id: '1089', task: 'Design Finalization', team: 'Priya', date: 'April 22' },
     { id: '1042', task: 'Module 2 Delivery', team: 'Rahul', date: 'April 25' },
     { id: '1067', task: 'Project Plan Approval', team: 'Priya', date: 'April 28' },
   ];
+
+  const getStatusVariant = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'completed': return 'default';
+      case 'in progress': return 'secondary';
+      case 'on hold': return 'destructive';
+      case 'planning': return 'outline';
+      default: return 'secondary';
+    }
+  };
 
   return (
     <div className="grid gap-6">
@@ -42,7 +63,7 @@ export default function AdminProjectsPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>सभी प्रोजेक्ट्स (कुल: 203 | एक्टिव: 45)</CardTitle>
+              <CardTitle>सभी प्रोजेक्ट्स</CardTitle>
                <div className="mt-4 flex flex-col md:flex-row items-center gap-4">
                 <div className="relative flex-1 w-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -60,14 +81,18 @@ export default function AdminProjectsPage() {
               </div>
             </CardHeader>
             <CardContent>
+               {isLoadingProjects ? (
+                <div className="flex justify-center items-center h-64">
+                  <Loader2 className="w-8 h-8 animate-spin" />
+                </div>
+              ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Project Name</TableHead>
-                    <TableHead>Client</TableHead>
+                    <TableHead>Client ID</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Progress</TableHead>
-                    <TableHead>Budget</TableHead>
                     <TableHead>Deadline</TableHead>
                     <TableHead>
                       <span className="sr-only">Actions</span>
@@ -75,12 +100,12 @@ export default function AdminProjectsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {projectList.map((project) => (
+                  {allProjects?.map((project) => (
                     <TableRow key={project.id}>
                       <TableCell className="font-medium">{project.name}</TableCell>
-                      <TableCell>{project.client}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{project.clientId}</TableCell>
                       <TableCell>
-                        <Badge variant={project.status === 'Completed' ? 'default' : 'secondary'}>
+                        <Badge variant={getStatusVariant(project.status)}>
                           {project.status}
                         </Badge>
                       </TableCell>
@@ -90,8 +115,7 @@ export default function AdminProjectsPage() {
                           <span>{project.progress}%</span>
                         </div>
                       </TableCell>
-                      <TableCell>₹{project.progress * 1000}</TableCell>
-                      <TableCell>{project.endDate}</TableCell>
+                      <TableCell>{new Date(project.endDate).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -112,6 +136,7 @@ export default function AdminProjectsPage() {
                   ))}
                 </TableBody>
               </Table>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -122,7 +147,7 @@ export default function AdminProjectsPage() {
             </CardHeader>
             <CardContent className="text-sm space-y-3">
                 <div className="flex justify-between"><span>कंप्लीट:</span> <span className="font-semibold">128 (63%)</span></div>
-                <div className="flex justify-between"><span>एक्टिव:</span> <span className="font-semibold">45 (22%)</span></div>
+                <div className="flex justify-between"><span>एक्टिव:</span> <span className="font-semibold">{allProjects?.length ?? 0}</span></div>
                 <div className="flex justify-between"><span>होल्ड:</span> <span className="font-semibold">15 (7%)</span></div>
                 <div className="flex justify-between"><span>प्लानिंग:</span> <span className="font-semibold">15 (7%)</span></div>
                 <Separator className="my-2" />

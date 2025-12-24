@@ -9,35 +9,15 @@ export const navLinks = [
 ];
 
 export const userList = [
-  { id: 1, name: 'Aarav Sharma', email: 'aarav.sharma@example.com', role: 'Admin', status: 'Active' },
-  { id: 2, name: 'Priya Patel', email: 'priya.patel@example.com', role: 'Client', status: 'Active' },
-  { id: 3, name: 'Rohan Gupta', email: 'rohan.gupta@example.com', role: 'Client', status: 'Inactive' },
-  { id: 4, name: 'Sneha Reddy', email: 'sneha.reddy@example.com', role: 'Admin', status: 'Active' },
-  { id: 5, name: 'Vikram Singh', email: 'vikram.singh@example.com', role: 'Client', status: 'Active' },
+  { id: 1, name: 'Admin User', email: 'admin@example.com', role: 'Admin', status: 'Active' },
+  { id: 2, name: 'Client User', email: 'client@example.com', role: 'Client', status: 'Active' },
 ];
 
-export let projectList = [
-    {
-        id: 'proj-001',
-        name: 'E-commerce Platform Development',
-        client: 'Priya Patel',
-        status: 'In Progress',
-        progress: 65,
-        startDate: '2023-01-15',
-        endDate: '2023-08-30',
-        timeline: `Phase 1: Discovery & Planning (Jan 15 - Feb 10, 2023) - Completed. Initial meetings held, project scope defined, and technology stack finalized. Key deliverables: Project brief, wireframes, and technical specification document.
-Phase 2: UI/UX Design (Feb 11 - Mar 20, 2023) - Completed. Created high-fidelity mockups for all pages, designed the mobile and desktop user experience, and established a complete design system in Figma.
-Phase 3: Frontend Development (Mar 21 - May 30, 2023) - Completed. Developed all client-facing pages using Next.js and Tailwind CSS. Integrated state management and connected to placeholder APIs.
-Phase 4: Backend Development (Jun 1 - Aug 10, 2023) - In Progress. Currently building out the database schema, developing RESTful APIs for products, users, and orders. Authentication endpoint is complete. Payment gateway integration is next on the list.
-Phase 5: Testing & QA (Aug 11 - Aug 25, 2023) - Not Started.
-Phase 6: Deployment & Launch (Aug 26 - Aug 30, 2023) - Not Started.`
-    },
-    { id: 'proj-002', name: 'Mobile App for Healthcare', client: 'Rohan Gupta', status: 'Completed', progress: 100 },
-    { id: 'proj-003', name: 'Corporate Website Redesign', client: 'Vikram Singh', status: 'On Hold', progress: 30 },
-    { id: 'proj-004', name: 'Marketing Campaign Landing Pages', client: 'Priya Patel', status: 'Planning', progress: 10 },
+export let projectList: any[] = [
+    // This can be populated from Firestore now
 ];
 
-// Function to add a new project to the list
+// Function to add a new project to the list (for optimistic UI)
 export const addProject = (project: any) => {
     projectList.unshift(project);
 };
