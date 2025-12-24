@@ -91,7 +91,7 @@ service cloud.firestore {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
       allow create: if isCreatingSelf(userId);
-      allow update: if isExistingOwner(userId) && isUpdatingOwnImmutableData(userId);
+      allow update: if (isExistingOwner(userId) && isUpdatingOwnImmutableData(userId)) || isAdmin();
       allow delete: if isExistingOwner(userId) || isAdmin();
 
       /**
