@@ -85,7 +85,7 @@ export default function AdminProjectsPage() {
                 <div className="flex justify-center items-center h-64">
                   <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
-              ) : (
+              ) : allProjects && allProjects.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -106,7 +106,7 @@ export default function AdminProjectsPage() {
                       <TableCell className="text-xs text-muted-foreground">{project.clientId}</TableCell>
                       <TableCell>
                         <Badge variant={getStatusVariant(project.status)}>
-                          {project.status}
+                          {project.status || 'N/A'}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -136,6 +136,11 @@ export default function AdminProjectsPage() {
                   ))}
                 </TableBody>
               </Table>
+              ) : (
+                <div className="text-center py-10 text-muted-foreground">
+                  <p>No projects found in the database.</p>
+                  <p className="text-sm">Try creating a project as a client to see it appear here.</p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -146,13 +151,13 @@ export default function AdminProjectsPage() {
               <CardTitle className="font-headline">प्रोजेक्ट स्टैटिस्टिक्स</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-3">
-                <div className="flex justify-between"><span>कंप्लीट:</span> <span className="font-semibold">128 (63%)</span></div>
+                <div className="flex justify-between"><span>कंप्लीट:</span> <span className="font-semibold">0</span></div>
                 <div className="flex justify-between"><span>एक्टिव:</span> <span className="font-semibold">{allProjects?.length ?? 0}</span></div>
-                <div className="flex justify-between"><span>होल्ड:</span> <span className="font-semibold">15 (7%)</span></div>
-                <div className="flex justify-between"><span>प्लानिंग:</span> <span className="font-semibold">15 (7%)</span></div>
+                <div className="flex justify-between"><span>होल्ड:</span> <span className="font-semibold">0</span></div>
+                <div className="flex justify-between"><span>प्लानिंग:</span> <span className="font-semibold">{allProjects?.filter(p => p.status === 'Planning').length ?? 0}</span></div>
                 <Separator className="my-2" />
-                <div className="flex justify-between"><span>औसत समय:</span> <span className="font-semibold">6.2 सप्ताह</span></div>
-                <div className="flex justify-between"><span>सक्सेस रेट:</span> <span className="font-semibold">89%</span></div>
+                <div className="flex justify-between"><span>औसत समय:</span> <span className="font-semibold">N/A</span></div>
+                <div className="flex justify-between"><span>सक्सेस रेट:</span> <span className="font-semibold">N/A</span></div>
             </CardContent>
           </Card>
           <Card>
@@ -183,10 +188,6 @@ export default function AdminProjectsPage() {
                         <span className="font-medium">{deadline.date}</span>
                     </li>
                 ))}
-                <li className="flex justify-between items-center text-primary font-semibold">
-                    <span>5 क्लाइंट पेमेंट ड्यू</span>
-                    <span>April 30</span>
-                </li>
             </ul>
         </CardContent>
       </Card>
