@@ -16,7 +16,7 @@ export const userList = [
   { id: 5, name: 'Vikram Singh', email: 'vikram.singh@example.com', role: 'Client', status: 'Active' },
 ];
 
-export const projectList = [
+export let projectList = [
     {
         id: 'proj-001',
         name: 'E-commerce Platform Development',
@@ -36,6 +36,11 @@ Phase 6: Deployment & Launch (Aug 26 - Aug 30, 2023) - Not Started.`
     { id: 'proj-003', name: 'Corporate Website Redesign', client: 'Vikram Singh', status: 'On Hold', progress: 30 },
     { id: 'proj-004', name: 'Marketing Campaign Landing Pages', client: 'Priya Patel', status: 'Planning', progress: 10 },
 ];
+
+// Function to add a new project to the list
+export const addProject = (project: any) => {
+    projectList.unshift(project);
+};
 
 export const blogPosts = [
   {
