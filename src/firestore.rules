@@ -38,10 +38,10 @@ service cloud.firestore {
 
     /**
      * Checks if the currently authenticated user is an admin.
-     * This relies on a custom claim being set on the user's auth token.
+     * This relies on a custom claim being set on the user's auth token OR if the email is admin@example.com
      */
     function isAdmin() {
-      return isSignedIn() && request.auth.token.admin == true;
+      return isSignedIn() && (request.auth.token.admin == true || request.auth.token.email == 'admin@example.com');
     }
 
     /**
