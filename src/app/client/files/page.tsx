@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { projectFiles } from '@/lib/placeholder-data';
-import { Download, File, Folder, Search } from 'lucide-react';
+import { Download, File, Folder, Search, FileText, Palette, FileArchive, ImageIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 export default function ClientFilesPage() {
@@ -14,17 +14,17 @@ export default function ClientFilesPage() {
   const getFileIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'pdf':
-        return <FileText className="text-red-500" />;
+        return <FileText className="text-red-500 h-5 w-5" />;
       case 'figma':
-        return <Palette className="text-purple-500" />;
+        return <Palette className="text-purple-500 h-5 w-5" />;
       case 'word':
-        return <FileText className="text-blue-500" />;
+        return <FileText className="text-blue-500 h-5 w-5" />;
       case 'zip':
-        return <FileArchive className="text-yellow-500" />;
+        return <FileArchive className="text-yellow-500 h-5 w-5" />;
       case 'png':
-        return <ImageIcon className="text-green-500" />;
+        return <ImageIcon className="text-green-500 h-5 w-5" />;
       default:
-        return <File className="text-muted-foreground" />;
+        return <File className="text-muted-foreground h-5 w-5" />;
     }
   };
 
@@ -60,7 +60,10 @@ export default function ClientFilesPage() {
             <TableBody>
               {clientFiles.map((file) => (
                 <TableRow key={file.id}>
-                  <TableCell className="font-medium">{file.name}</TableCell>
+                  <TableCell className="font-medium flex items-center gap-3">
+                    {getFileIcon(file.type)}
+                    <span>{file.name}</span>
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline">{file.type}</Badge>
                   </TableCell>
@@ -84,9 +87,3 @@ export default function ClientFilesPage() {
     </div>
   );
 }
-
-// Dummy components for icons that might not be in lucide-react
-const FileText = (props: any) => <File {...props} />;
-const Palette = (props: any) => <File {...props} />;
-const FileArchive = (props: any) => <File {...props} />;
-const ImageIcon = (props: any) => <File {...props} />;
