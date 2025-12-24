@@ -1,15 +1,15 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, Users, CheckCircle2, Star, Target, PieChart, BrainCircuit, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Users, CheckCircle2, Star, Target, PieChart, BrainCircuit, AlertTriangle, ArrowDown, Smile } from 'lucide-react';
 
 const performanceMetrics = [
     { title: 'यूज़र ग्रोथ', monthly: '+18.5%', yoy: '+142%', target: '+15%', icon: <Users /> },
     { title: 'प्रोजेक्ट सक्सेस', rate: '89.2%', change: '▲ 3.2%', target: '85%', icon: <CheckCircle2 /> },
     { title: 'क्लाइंट संतुष्टि', score: '4.7/5', change: '▲ 0.4', target: '4.5', icon: <Star /> },
     { title: 'औसत रेवेन्यू/प्रोजेक्ट', value: '₹2,22,655', change: '▲ ₹18,500', target: '₹2,00,000', icon: <TrendingUp /> },
-    { title: 'चर्न रेट', value: '2.1%', change: '▼ 0.3%', target: '<3%', icon: <Users /> },
-    { title: 'NPS स्कोर', value: '+68', change: '▲ 5', target: '+50', icon: <PieChart /> },
+    { title: 'चर्न रेट', value: '2.1%', change: '▼ 0.3%', target: '<3%', icon: <ArrowDown /> },
+    { title: 'NPS स्कोर', value: '+68', change: '▲ 5', target: '+50', icon: <Smile /> },
 ];
 
 const kpiData = [
@@ -53,7 +53,7 @@ export default function AnalyticsDashboardPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{metric.monthly || metric.rate || metric.score || metric.value}</div>
-                                <p className={`text-xs ${metric.change?.startsWith('▲') ? 'text-green-500' : 'text-red-500'}`}>{metric.change || metric.yoy}</p>
+                                <p className={`text-xs ${metric.change?.includes('▲') ? 'text-green-500' : 'text-red-500'}`}>{metric.change || metric.yoy}</p>
                                 <p className="text-xs text-muted-foreground">टारगेट: {metric.target}</p>
                             </CardContent>
                         </Card>
