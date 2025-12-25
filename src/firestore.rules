@@ -9,50 +9,50 @@ service cloud.firestore {
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-
+    
     function isAdmin() {
       return request.auth.token.email == 'admin@example.com';
     }
 
+    // Rules for individual user data access
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isOwner(userId) || isAdmin();
-      allow delete: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update, delete: if isOwner(userId) || isAdmin();
 
+      // Rules for projects within a user's collection
       match /projects/{projectId} {
         allow get, list: if isOwner(userId) || isAdmin();
-        allow create: if isOwner(userId) && request.resource.data.clientId == userId;
+        allow create: if isOwner(userId);
         allow update, delete: if isOwner(userId) || isAdmin();
 
+        // Rules for sub-collections of projects
         match /files/{fileId} {
-          allow get, list: if isOwner(userId) || isAdmin();
-          allow create: if isOwner(userId);
-          allow update, delete: if isOwner(userId) || isAdmin();
+          allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
         }
-
         match /timelineSummaries/{timelineSummaryId} {
-          allow get, list: if isOwner(userId) || isAdmin();
-          allow create: if isOwner(userId);
-          allow update, delete: if isOwner(userId) || isAdmin();
+          allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
         }
       }
     }
-    
-    match /users/{document=**} {
-      allow read, list: if isAdmin();
+
+    // ADMIN-SPECIFIC RULES FOR LISTING ALL DATA
+    // This rule allows the admin to list all users.
+    match /users/{userId} {
+      allow list: if isAdmin();
     }
     
+    // This rule allows the admin to perform a collectionGroup query on 'projects'
     match /{path=**}/projects/{projectId} {
-        allow read, list: if isAdmin();
+      allow list: if isAdmin();
     }
 
-
+    // Rules for public content
     match /blogPosts/{blogPostId} {
       allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if (resource != null && isOwner(resource.data.authorId)) || isAdmin();
-      allow delete: if (resource != null && isOwner(resource.data.authorId)) || isAdmin();
+      allow update: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
     }
 
     match /landingPages/{landingPageId} {
