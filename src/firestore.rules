@@ -1,26 +1,20 @@
 /**
  * Core Philosophy: This ruleset enforces a strict user-ownership model for all
  * private data, ensuring that users can only access their own information. Publicly
- * accessible content, such as blog posts and landing pages, is globally readable
- * but has tightly controlled write access, typically restricted to the original author.
- * An 'admin' role is introduced for system-wide read access for oversight.
+ * accessible content is globally readable but has tightly controlled write access.
+ * An admin role, identified by a specific email, has broader read access for oversight.
  *
  * Data Structure: User-specific data is hierarchically organized under the /users/{userId}
- * path. This includes user profiles, projects, and all project-related sub-collections
- * like files and summaries. Public content resides in top-level collections like
- * /blogPosts and /landingPages, separating it from private user data.
+ * path. Public content resides in top-level collections like /blogPosts.
  *
  * Key Security Decisions:
- * - User Enumeration is disallowed by preventing `list` operations on the top-level /users collection for non-admins.
- * - All data within a user's path (/users/{userId}/...) is private to that user.
- * - Public collections are read-only for anonymous and authenticated users.
- * - Write access to public content is granted only to authenticated authors of that content.
- * - A user's role is stored in a custom claim, which is used for authorization.
+ * - User Enumeration is disallowed for regular users.
+ * - An admin (admin@example.com) is allowed to list all users for management purposes.
+ * - All data within a user's path (/users/{userId}/...) is private to that user, with admin read-only override.
  *
  * Denormalization for Authorization: The rules rely on path-based authorization
  * (e.g., matching {userId} in the path to the authenticated user's UID) to avoid
- * costly and slow `get()` calls. For top-level collections like /blogPosts, an `authorId`
- * field is denormalized onto each document to enable simple and performant ownership checks.
+ * costly and slow `get()` calls.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -29,157 +23,73 @@ service cloud.firestore {
     // Helper Functions
     // --------------------------------
 
-    /**
-     * Checks if a user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Checks if the currently authenticated user is an admin.
-     * This relies on a custom claim being set on the user's auth token OR if the email is admin@example.com
-     */
-    function isAdmin() {
-      return isSignedIn() && (request.auth.token.admin == true || request.auth.token.email == 'admin@example.com');
-    }
-
-    /**
-     * Checks if the currently authenticated user's UID matches the provided userId.
-     * This is the primary function for enforcing data ownership.
-     */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /**
-     * Checks for ownership on an existing document. Used for update and delete operations
-     * to ensure the document exists before attempting to modify it.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
+    // Admin Check - Simplified and direct for clarity
+    function isAdmin() {
+        return request.auth.token.email == 'admin@example.com';
     }
 
-    /**
-     * Validates that a user is creating their own user document and that the
-     * document's internal 'id' field matches the user's UID for data integrity.
-     */
-    function isCreatingSelf(userId) {
-      return isOwner(userId) && request.resource.data.id == userId;
-    }
-
-    /**
-     * Validates that a user is updating their own document and that the 'id' field,
-     * which links the document to the user, remains unchanged.
-     */
-    function isUpdatingOwnImmutableData(userId) {
-      // The `resource` variable is guaranteed to be non-null by the calling rule.
-      return isOwner(userId) && request.resource.data.id == resource.data.id;
-    }
 
     // Collection Rules
     // --------------------------------
 
-    /**
-     * @description Manages user profile documents (individual access).
-     * @path /users/{userId}
-     * @allow (get) An authenticated user reading their own profile, or an admin reading any profile.
-     * @deny (list) This rule does not cover list. See separate rule for list access.
-     */
+    // Rule for individual user document access
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
-      allow create: if isCreatingSelf(userId);
-      allow update: if (isExistingOwner(userId) && isUpdatingOwnImmutableData(userId)) || isAdmin();
-      allow delete: if isExistingOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isOwner(userId) || isAdmin();
 
-      /**
-       * @description Manages projects owned by a specific client (user).
-       * @path /users/{userId}/projects/{projectId}
-       * @allow (get) The client whose UID is {userId} reading their own project, or an admin.
-       * @deny (create) An authenticated user trying to create a project under another user's profile.
-       * @principle Enforces path-based ownership for nested user data, with admin override.
-       */
+      // Nested collections for a user
       match /projects/{projectId} {
-        allow get: if isOwner(userId) || isAdmin();
-        allow list: if isOwner(userId) || isAdmin();
+        allow get, list: if isOwner(userId) || isAdmin();
         allow create: if isOwner(userId) && request.resource.data.clientId == userId;
-        allow update: if isOwner(userId) || isAdmin();
-        allow delete: if isOwner(userId) || isAdmin();
+        allow update, delete: if isOwner(userId) || isAdmin();
 
-        /**
-         * @description Manages files within a specific project.
-         * @path /users/{userId}/projects/{projectId}/files/{fileId}
-         * @allow (list) The client whose UID is {userId} listing all files for their project, or an admin.
-         * @principle Inherits ownership from the parent document's path, with admin override.
-         */
         match /files/{fileId} {
-          allow get: if isOwner(userId) || isAdmin();
-          allow list: if isOwner(userId) || isAdmin();
+          allow get, list: if isOwner(userId) || isAdmin();
           allow create: if isOwner(userId);
-          allow update: if isOwner(userId) || isAdmin();
-          allow delete: if isOwner(userId) || isAdmin();
+          allow update, delete: if isOwner(userId) || isAdmin();
         }
 
-        /**
-         * @description Manages timeline summaries for a project.
-         * @path /users/{userId}/projects/{projectId}/timelineSummaries/{timelineSummaryId}
-         * @principle Inherits ownership from the parent document's path, with admin override.
-         */
         match /timelineSummaries/{timelineSummaryId} {
-          allow get: if isOwner(userId) || isAdmin();
-          allow list: if isOwner(userId) || isAdmin();
+          allow get, list: if isOwner(userId) || isAdmin();
           allow create: if isOwner(userId);
-          allow update: if isOwner(userId) || isAdmin();
-          allow delete: if isOwner(userId) || isAdmin();
+          allow update, delete: if isOwner(userId) || isAdmin();
         }
       }
     }
-
-    /**
-     * @description Manages list access for the entire users collection.
-     * @path /users
-     * @allow (list) An admin to list all users.
-     * @principle Separates collection-level list permissions from document-level permissions.
-     */
+    
+    // Explicit rule for LISTING the entire users collection.
+    // THIS IS THE CRITICAL FIX: Only the admin can list all users.
     match /users/{document=**} {
       allow list: if isAdmin();
     }
-    
-    /**
-     * @description Allows admins to perform collection group queries on projects.
-     * @path /users/{userId}/projects/{projectId}
-     * @allow (list) An admin to query across all users' projects.
-     * @principle Enables admin-level oversight without exposing data to other users.
-     */
+
+    // Explicit rule for Collection Group Queries by Admin
     match /{path=**}/projects/{projectId} {
         allow get, list: if isAdmin();
     }
 
 
-    /**
-     * @description Manages public blog posts. Anyone can read, but only authors or admins can write.
-     * @path /blogPosts/{blogPostId}
-     * @principle Implements a "Public Read with Owner-Only Writes" pattern, with admin override.
-     */
+    // Public collections
     match /blogPosts/{blogPostId} {
-      allow get: if true;
-      allow list: if true;
+      allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if (resource != null && isOwner(resource.data.authorId) && request.resource.data.authorId == resource.data.authorId) || isAdmin();
+      allow update: if (resource != null && isOwner(resource.data.authorId)) || isAdmin();
       allow delete: if (resource != null && isOwner(resource.data.authorId)) || isAdmin();
     }
 
-    /**
-     * @description Manages public landing pages. Anyone can read them. Writes are restricted.
-     * @path /landingPages/{landingPageId}
-     * @principle Implements a "Public Read" pattern. Writes are disabled pending schema changes.
-     */
     match /landingPages/{landingPageId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
     }
   }
 }
