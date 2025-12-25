@@ -40,12 +40,22 @@ export default function AdminProjectsPage() {
   const getStatusVariant = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'completed': return 'default';
-      case 'in progress': return 'secondary';
+      case 'development': return 'secondary';
       case 'on hold': return 'destructive';
       case 'planning': return 'outline';
       default: return 'secondary';
     }
   };
+
+  const projectStats = useMemoFirebase(() => {
+    if (!allProjects) return { completed: 0, active: 0, onHold: 0, planning: 0 };
+    return {
+      completed: allProjects.filter(p => p.status === 'Completed').length,
+      active: allProjects.filter(p => p.status !== 'Completed' && p.status !== 'On Hold').length,
+      onHold: allProjects.filter(p => p.status === 'On Hold').length,
+      planning: allProjects.filter(p => p.status === 'Planning').length,
+    }
+  }, [allProjects]);
 
   return (
     <div className="grid gap-6">
@@ -151,10 +161,10 @@ export default function AdminProjectsPage() {
               <CardTitle className="font-headline">प्रोजेक्ट स्टैटिस्टिक्स</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-3">
-                <div className="flex justify-between"><span>कंप्लीट:</span> <span className="font-semibold">0</span></div>
-                <div className="flex justify-between"><span>एक्टिव:</span> <span className="font-semibold">{allProjects?.length ?? 0}</span></div>
-                <div className="flex justify-between"><span>होल्ड:</span> <span className="font-semibold">0</span></div>
-                <div className="flex justify-between"><span>प्लानिंग:</span> <span className="font-semibold">{allProjects?.filter(p => p.status === 'Planning').length ?? 0}</span></div>
+                <div className="flex justify-between"><span>कंप्लीट:</span> <span className="font-semibold">{projectStats.completed}</span></div>
+                <div className="flex justify-between"><span>एक्टिव:</span> <span className="font-semibold">{projectStats.active}</span></div>
+                <div className="flex justify-between"><span>होल्ड:</span> <span className="font-semibold">{projectStats.onHold}</span></div>
+                <div className="flex justify-between"><span>प्लानिंग:</span> <span className="font-semibold">{projectStats.planning}</span></div>
                 <Separator className="my-2" />
                 <div className="flex justify-between"><span>औसत समय:</span> <span className="font-semibold">N/A</span></div>
                 <div className="flex justify-between"><span>सक्सेस रेट:</span> <span className="font-semibold">N/A</span></div>
