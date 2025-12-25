@@ -81,15 +81,13 @@ service cloud.firestore {
     // --------------------------------
 
     /**
-     * @description Manages user profile documents.
+     * @description Manages user profile documents (individual access).
      * @path /users/{userId}
      * @allow (get) An authenticated user reading their own profile, or an admin reading any profile.
-     * @deny (list) Non-admins attempting to list all user profiles.
-     * @principle Restricts access to a user's own data tree and prevents user enumeration for non-admins.
+     * @deny (list) This rule does not cover list. See separate rule for list access.
      */
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
       allow create: if isCreatingSelf(userId);
       allow update: if (isExistingOwner(userId) && isUpdatingOwnImmutableData(userId)) || isAdmin();
       allow delete: if isExistingOwner(userId) || isAdmin();
@@ -135,6 +133,16 @@ service cloud.firestore {
           allow delete: if isOwner(userId) || isAdmin();
         }
       }
+    }
+
+    /**
+     * @description Manages list access for the entire users collection.
+     * @path /users
+     * @allow (list) An admin to list all users.
+     * @principle Separates collection-level list permissions from document-level permissions.
+     */
+    match /users/{document=**} {
+      allow list: if isAdmin();
     }
     
     /**
