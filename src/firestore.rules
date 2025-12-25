@@ -1,58 +1,10 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-    
-    function isAdmin() {
-      return request.auth.token.email == 'admin@example.com';
-    }
-
-    // Rules for individual user data access
-    match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin(); // Explicitly allow admin to list users
-      allow create: if isOwner(userId);
-      allow update, delete: if isOwner(userId) || isAdmin();
-
-      // Rules for projects within a user's collection
-      match /projects/{projectId} {
-        allow get, list: if isOwner(userId) || isAdmin();
-        allow create: if isOwner(userId);
-        allow update, delete: if isOwner(userId) || isAdmin();
-
-        // Rules for sub-collections of projects
-        match /files/{fileId} {
-          allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
-        }
-        match /timelineSummaries/{timelineSummaryId} {
-          allow get, list, create, update, delete: if isOwner(userId) || isAdmin();
-        }
-      }
-    }
-    
-    // This rule allows the admin to perform a collectionGroup query on 'projects'
-    match /{path=**}/projects/{projectId} {
-      allow get, list: if isAdmin();
-    }
-
-    // Rules for public content
-    match /blogPosts/{blogPostId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
-      allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
-    }
-
-    match /landingPages/{landingPageId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+    // 👇 TEMPORARY RULES (सभी को एक्सेस) - पहले इनसे शुरू करें
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
