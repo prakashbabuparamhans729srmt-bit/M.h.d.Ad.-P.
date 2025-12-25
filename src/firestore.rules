@@ -17,6 +17,7 @@ service cloud.firestore {
     // Rules for individual user data access
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin(); // Explicitly allow admin to list users
       allow create: if isOwner(userId);
       allow update, delete: if isOwner(userId) || isAdmin();
 
@@ -35,16 +36,10 @@ service cloud.firestore {
         }
       }
     }
-
-    // ADMIN-SPECIFIC RULES FOR LISTING ALL DATA
-    // This rule allows the admin to list all users.
-    match /users/{userId} {
-      allow list: if isAdmin();
-    }
     
     // This rule allows the admin to perform a collectionGroup query on 'projects'
     match /{path=**}/projects/{projectId} {
-      allow list: if isAdmin();
+      allow get, list: if isAdmin();
     }
 
     // Rules for public content
