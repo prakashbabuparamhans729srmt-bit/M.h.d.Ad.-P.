@@ -1,7 +1,11 @@
+'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, Users, CheckCircle2, Star, Target, PieChart, BrainCircuit, AlertTriangle, ArrowDown, Smile } from 'lucide-react';
+import { TrendingUp, Users, CheckCircle2, Star, Target, ArrowDown, Smile, BrainCircuit, AlertTriangle } from 'lucide-react';
+import { RevenueChart } from '@/components/admin/charts/revenue-chart';
+import { UserGrowthChart } from '@/components/admin/charts/user-growth-chart';
+
 
 const performanceMetrics = [
     { title: 'यूज़र ग्रोथ', monthly: '+18.5%', yoy: '+142%', target: '+15%', icon: <Users /> },
@@ -66,19 +70,17 @@ export default function AnalyticsDashboardPage() {
                     <CardHeader>
                         <CardTitle>ट्रेंड्स एनालिसिस</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div>
-                                <h4 className="font-semibold text-sm mb-2">मासिक रेवेन्यू</h4>
-                                <div className="bg-muted h-24 rounded-md flex items-center justify-center text-muted-foreground text-xs">
-                                    [रेवेन्यू चार्ट यहाँ]
-                                </div>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <h4 className="font-semibold text-sm mb-2">मासिक रेवेन्यू</h4>
+                            <div className="h-48">
+                                <RevenueChart />
                             </div>
-                             <div>
-                                <h4 className="font-semibold text-sm mb-2">यूज़र ग्रोथ</h4>
-                                <div className="bg-muted h-24 rounded-md flex items-center justify-center text-muted-foreground text-xs">
-                                    [यूज़र ग्रोथ चार्ट यहाँ]
-                                </div>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-sm mb-2 mt-6">यूज़र ग्रोथ</h4>
+                            <div className="h-48">
+                                <UserGrowthChart />
                             </div>
                         </div>
                     </CardContent>
