@@ -3,40 +3,31 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Helper function to check for admin custom claim.
-    // This is the core of the RBAC (Role-Based Access Control) system.
     function isAdmin() {
       return request.auth.token.admin == true;
     }
 
-    // Rules for the 'users' collection
+    // A user can read their own document, but only an admin can list all users.
     match /users/{userId} {
-      // Admins can read and write to any user document.
-      allow read, write: if isAdmin();
-      // A specific user can only read or write their own document.
-      allow read, write: if request.auth.uid == userId;
+      allow get: if request.auth.uid == userId || isAdmin();
+      allow list: if isAdmin();
+      allow write: if request.auth.uid == userId || isAdmin();
     }
     
-    // Allow admins to list the entire 'users' collection.
-    // This is crucial for the User Management page.
-    match /users {
-      allow list: if isAdmin();
+    // Rules for project subcollections
+    match /users/{userId}/projects/{projectId} {
+      // An admin can read any project. A user can read their own projects.
+      allow read: if isAdmin() || request.auth.uid == userId;
+      // An admin can write to any project. A user can write to their own projects.
+      allow write: if isAdmin() || request.auth.uid == userId;
     }
-
-
-    // Rules for the 'projects' subcollection, accessible as a collection group.
-    // This allows an admin to query across all projects from all users.
+    
+    // As a collection group, admins can query across all projects from all users.
     match /{path=**}/projects/{projectId} {
-       // Admins can read/list any project from any user.
-       allow read: if isAdmin();
-
-       // A user can read/write to their own projects.
-       // The path[1] corresponds to the {userId} in '/users/{userId}/...'.
-       // An admin can also write to any project.
-       allow write: if request.auth.uid == path[1] || isAdmin();
+       allow read, list: if isAdmin();
     }
-
-    // Default deny rule for any other path not explicitly matched.
-    // This is a security best practice.
+    
+    // Default deny all other reads/writes
     match /{document=**} {
       allow read, write: if false;
     }

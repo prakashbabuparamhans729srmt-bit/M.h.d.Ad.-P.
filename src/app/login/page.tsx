@@ -9,11 +9,11 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/shared/logo';
-import { useAuth, useUser, initiateEmailSignIn, useAdmin } from '@/firebase';
+import { useAuth, useUser, useAdmin } from '@/firebase';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2 } from 'lucide-react';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
@@ -28,6 +28,7 @@ export default function LoginPage() {
   const { isAdmin, isAdminLoading } = useAdmin();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const form = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
@@ -50,14 +51,34 @@ export default function LoginPage() {
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsSubmitting(true);
-    // We are not awaiting this, the onAuthStateChanged in the provider will handle the redirect
-    initiateEmailSignIn(auth, data.email, data.password);
+    setAuthError(null);
+    try {
+      // CRITICAL FIX: Await the sign-in process to ensure auth state is settled
+      // before any potential redirects from the useEffect hook.
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      // The onAuthStateChanged listener in FirebaseProvider will handle the rest,
+      // including custom claims refresh and the redirect via the useEffect above.
+    } catch (error: any) {
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+        // If login fails, try to sign up the user with the same credentials.
+        try {
+          await createUserWithEmailAndPassword(auth, data.email, data.password);
+        } catch (signUpError: any) {
+            setAuthError(signUpError.message);
+        }
+      } else {
+        setAuthError(error.message);
+      }
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   if (isUserLoading || isAdminLoading || user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-4">Authenticating...</p>
       </div>
     );
   }
@@ -106,6 +127,7 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
+              {authError && <p className="text-sm font-medium text-destructive">{authError}</p>}
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Login
