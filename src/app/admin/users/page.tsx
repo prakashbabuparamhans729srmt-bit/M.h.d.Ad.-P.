@@ -24,19 +24,23 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useFirestore, useCollection, useMemoFirebase, useAdmin } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
 
 export default function AdminUsersPage() {
   const firestore = useFirestore();
+  const { isAdmin, isAdminLoading } = useAdmin();
 
   const usersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    // Only fetch users if the current user is an admin
+    if (!firestore || !isAdmin) return null;
     return collection(firestore, 'users');
-  }, [firestore]);
+  }, [firestore, isAdmin]);
 
   const { data: userList, isLoading: isLoadingUsers, error } = useCollection(usersQuery);
+  
+  const isLoading = isAdminLoading || isLoadingUsers;
 
   return (
     <Card>
@@ -76,14 +80,14 @@ export default function AdminUsersPage() {
           </div>
         </div>
 
-        {isLoadingUsers ? (
+        {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
-        ) : error ? (
+        ) : error || !isAdmin ? (
            <div className="text-center py-10 text-destructive">
-            <p>Error loading users: Permission denied.</p>
-            <p className="text-sm text-muted-foreground">Please ensure you are logged in as an admin with the correct custom claims (`admin: true`).</p>
+            <p>Error: Permission Denied.</p>
+            <p className="text-sm text-muted-foreground">You do not have the required admin privileges to view this page. Please contact your system administrator.</p>
           </div>
         ) : userList && userList.length > 0 ? (
           <Table>
@@ -133,7 +137,7 @@ export default function AdminUsersPage() {
           </Table>
         ) : (
           <div className="text-center py-10 text-muted-foreground">
-            No users found in the database.
+             {isAdmin ? 'No users found in the database.' : 'Access denied.'}
           </div>
         )}
 
