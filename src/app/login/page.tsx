@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/shared/logo';
-import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
+import { useAuth, useUser, initiateEmailSignIn, useAdmin } from '@/firebase';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2 } from 'lucide-react';
 
@@ -25,6 +25,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const { isAdmin, isAdminLoading } = useAdmin();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,17 +38,15 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
-    if (!isUserLoading && user) {
-      // Assuming a simple role check for redirection.
-      // You might have more complex logic based on user roles from Firestore.
-      const userEmail = user.email || '';
-      if (userEmail.includes('admin')) {
+    // Wait until both user and admin status are fully loaded.
+    if (!isUserLoading && !isAdminLoading && user) {
+      if (isAdmin) {
         router.push('/admin/dashboard');
       } else {
         router.push('/client/dashboard');
       }
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, isAdmin, isAdminLoading, router]);
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsSubmitting(true);
@@ -55,7 +54,7 @@ export default function LoginPage() {
     initiateEmailSignIn(auth, data.email, data.password);
   };
 
-  if (isUserLoading || user) {
+  if (isUserLoading || isAdminLoading || user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
