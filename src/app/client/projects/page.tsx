@@ -15,6 +15,7 @@ export default function ClientProjectsPage() {
   const firestore = useFirestore();
 
   const projectsQuery = useMemoFirebase(() => {
+    // CRITICAL FIX: Do not create the query until BOTH user and firestore are available.
     if (!user || !firestore) return null;
     return collection(firestore, 'users', user.uid, 'projects');
   }, [firestore, user]);
@@ -22,7 +23,7 @@ export default function ClientProjectsPage() {
   const { data: clientProjects, isLoading: isLoadingProjects } = useCollection(projectsQuery);
 
   const getStatusVariant = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case 'completed':
         return 'default';
       case 'in progress':
@@ -36,6 +37,7 @@ export default function ClientProjectsPage() {
     }
   };
 
+  // Combine both loading states for a seamless UI experience.
   const isLoading = isUserLoading || isLoadingProjects;
 
   return (
