@@ -1,9 +1,29 @@
+'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Briefcase, DollarSign, TrendingUp, AlertTriangle, HeartPulse, Activity } from 'lucide-react';
+import { Users, Briefcase, DollarSign, TrendingUp, AlertTriangle, HeartPulse, Activity, Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useFirestore, useCollection, useMemoFirebase, useCollectionGroup } from '@/firebase';
+import { collection, collectionGroup, query } from 'firebase/firestore';
 
 export default function AdminDashboardPage() {
+  const firestore = useFirestore();
+
+  const usersQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'users');
+  }, [firestore]);
+
+  const allProjectsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collectionGroup(firestore, 'projects'));
+  }, [firestore]);
+
+  const { data: userList, isLoading: isLoadingUsers } = useCollection(usersQuery);
+  const { data: allProjects, isLoading: isLoadingProjects } = useCollection(allProjectsQuery);
+  
+  const isLoading = isLoadingUsers || isLoadingProjects;
+
   return (
     <div className="grid gap-6">
       <h1 className="text-3xl font-bold font-headline">मास्टर एडमिन पैनल</h1>
@@ -19,8 +39,12 @@ export default function AdminDashboardPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,248</div>
-              <p className="text-xs text-muted-foreground">80% सक्रिय</p>
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <div className="text-2xl font-bold">{userList?.length ?? 0}</div>
+              )}
+              <p className="text-xs text-muted-foreground">कुल पंजीकृत उपयोगकर्ता</p>
             </CardContent>
           </Card>
           <Card>
@@ -29,8 +53,12 @@ export default function AdminDashboardPage() {
               <Briefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">45</div>
-              <p className="text-xs text-muted-foreground">60% क्षमता पर</p>
+               {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <div className="text-2xl font-bold">{allProjects?.length ?? 0}</div>
+              )}
+              <p className="text-xs text-muted-foreground">सभी क्लाइंट्स में</p>
             </CardContent>
           </Card>
           <Card>
