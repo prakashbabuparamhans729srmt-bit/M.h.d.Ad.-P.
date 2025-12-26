@@ -1,26 +1,30 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper Functions
+    // Helper function to identify the admin user
     function isAdmin() {
       return request.auth != null && request.auth.token.email == 'admin@example.com';
     }
 
-    // Admin can read everything
-    match /{path=**} {
-      allow read: if isAdmin();
-    }
-    
-    // Rule for listing users - only admin can do this
+    // Rule for the 'users' collection
     match /users/{userId} {
+      // Allow admin to list all users
       allow list: if isAdmin();
+      // Allow a user to access their own document, and admin to access any user document
       allow read, write: if request.auth.uid == userId || isAdmin();
     }
 
-    // Rule for listing all projects across all users - only admin can do this
+    // Rule for the 'projects' collection group
+    // This allows the admin to query across all users' projects
     match /{path=**}/projects/{projectId} {
        allow read, list: if isAdmin();
+       // Allow a user to write to their own projects, and admin to write to any project
        allow write: if request.auth.uid == path[1] || isAdmin();
+    }
+    
+    // Fallback for any other path - generally restrictive
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
