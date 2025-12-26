@@ -179,16 +179,23 @@ export const useFirebaseApp = (): FirebaseApp => {
   return firebaseApp;
 };
 
-type MemoFirebase <T> = T & {__memo?: boolean};
+type MemoFirebase<T> = T & { __memo?: boolean };
 
-export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
+export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | null {
   const memoized = useMemo(factory, deps);
+
+  // If the factory returns null/undefined (e.g. firestore isn't ready), just return it.
+  if (!memoized) {
+    return null;
+  }
   
-  if(typeof memoized !== 'object' || memoized === null) return memoized;
-  (memoized as MemoFirebase<T>).__memo = true;
+  if (typeof memoized === 'object' && memoized !== null) {
+    (memoized as MemoFirebase<T>).__memo = true;
+  }
   
   return memoized;
 }
+
 
 /**
  * Hook specifically for accessing the authenticated user's state.
