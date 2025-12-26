@@ -31,15 +31,12 @@ import { collection } from 'firebase/firestore';
 export default function AdminUsersPage() {
   const firestore = useFirestore();
 
-  // NOTE: This will NOT work because of security rules preventing listing users.
-  // This is left here to demonstrate the desired functionality, but in a real app,
-  // a different approach (e.g., an admin-readable 'user_profiles' collection) would be needed.
   const usersQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return collection(firestore, 'users');
   }, [firestore]);
 
-  const { data: userList, isLoading: isLoadingUsers } = useCollection(usersQuery);
+  const { data: userList, isLoading: isLoadingUsers, error } = useCollection(usersQuery);
 
   return (
     <Card>
@@ -82,6 +79,11 @@ export default function AdminUsersPage() {
         {isLoadingUsers ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
+        ) : error ? (
+           <div className="text-center py-10 text-destructive">
+            <p>Error loading users: Permission denied.</p>
+            <p className="text-sm text-muted-foreground">Please ensure you are logged in as an admin with the correct custom claims.</p>
           </div>
         ) : userList && userList.length > 0 ? (
           <Table>
@@ -131,8 +133,7 @@ export default function AdminUsersPage() {
           </Table>
         ) : (
           <div className="text-center py-10 text-muted-foreground">
-            No users found or cannot access user data.<br/>
-            (Note: Listing users is restricted by default security rules.)
+            No users found in the database.
           </div>
         )}
 

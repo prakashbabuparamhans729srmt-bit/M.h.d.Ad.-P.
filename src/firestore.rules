@@ -1,28 +1,37 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to identify the admin user
+
+    // Helper function to check for admin custom claim.
+    // This is the core of the RBAC (Role-Based Access Control) system.
     function isAdmin() {
-      return request.auth != null && request.auth.token.email == 'admin@example.com';
+      return request.auth.token.admin == true;
     }
 
-    // Rule for the 'users' collection
+    // Rules for the 'users' collection
     match /users/{userId} {
-      // Allow admin to list all users
+      // Admins can read and write to any user document.
+      // A specific user can only read or write their own document.
+      allow read, write: if isAdmin() || request.auth.uid == userId;
+
+      // The 'list' operation is handled on the collection itself.
       allow list: if isAdmin();
-      // Allow a user to access their own document, and admin to access any user document
-      allow read, write: if request.auth.uid == userId || isAdmin();
     }
 
-    // Rule for the 'projects' collection group
-    // This allows the admin to query across all users' projects
+    // Rules for the 'projects' subcollection, accessible as a collection group.
+    // This allows an admin to query across all projects from all users.
     match /{path=**}/projects/{projectId} {
+       // Admins can read/list any project from any user.
        allow read, list: if isAdmin();
-       // Allow a user to write to their own projects, and admin to write to any project
+
+       // A user can write to their own projects.
+       // The path[1] corresponds to the {userId} in '/users/{userId}/...'.
+       // An admin can also write to any project.
        allow write: if request.auth.uid == path[1] || isAdmin();
     }
-    
-    // Fallback for any other path - generally restrictive
+
+    // Default deny rule for any other path not explicitly matched.
+    // This is a security best practice.
     match /{document=**} {
       allow read, write: if false;
     }
