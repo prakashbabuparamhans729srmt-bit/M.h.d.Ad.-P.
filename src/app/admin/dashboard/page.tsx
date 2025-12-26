@@ -16,7 +16,6 @@ export default function AdminDashboardPage() {
 
   const allProjectsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    // Corrected the query to be on the 'projects' collection group
     return query(collectionGroup(firestore, 'projects'));
   }, [firestore]);
 
@@ -40,7 +39,7 @@ export default function AdminDashboardPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              {isLoading ? (
+              {isLoadingUsers ? (
                 <Loader2 className="h-6 w-6 animate-spin" />
               ) : (
                 <div className="text-2xl font-bold">{userList?.length ?? 0}</div>
@@ -54,7 +53,7 @@ export default function AdminDashboardPage() {
               <Briefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-               {isLoading ? (
+               {isLoadingProjects ? (
                 <Loader2 className="h-6 w-6 animate-spin" />
               ) : (
                 <div className="text-2xl font-bold">{allProjects?.length ?? 0}</div>
