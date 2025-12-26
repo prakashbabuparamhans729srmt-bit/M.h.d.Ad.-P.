@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,8 +21,12 @@ import { Separator } from '@/components/ui/separator';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, collectionGroup, query } from 'firebase/firestore';
 
+const ALL_STATUSES = ['Planning', 'Design', 'Development', 'Testing', 'Completed', 'On Hold'];
+
 export default function AdminProjectsPage() {
-  const projectStatuses = ['Planning', 'Design', 'Development', 'Testing', 'Completed', 'On Hold'];
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  
   const firestore = useFirestore();
 
   const allProjectsQuery = useMemoFirebase(() => {
@@ -46,12 +51,33 @@ export default function AdminProjectsPage() {
       default: return 'secondary';
     }
   };
+  
+  const filteredProjects = useMemo(() => {
+    if (!allProjects) return [];
+    
+    return allProjects.filter(project => {
+      const matchesSearch = searchTerm === '' ||
+        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.clientId.toLowerCase().includes(searchTerm.toLowerCase());
+        
+      const matchesStatus = selectedStatuses.length === 0 || 
+        (project.status && selectedStatuses.includes(project.status));
 
-  const projectStats = useMemoFirebase(() => {
+      return matchesSearch && matchesStatus;
+    });
+  }, [allProjects, searchTerm, selectedStatuses]);
+
+  const handleStatusChange = (status: string, checked: boolean | string) => {
+    setSelectedStatuses(prev => 
+      checked ? [...prev, status] : prev.filter(s => s !== status)
+    );
+  };
+
+  const projectStats = useMemo(() => {
     if (!allProjects) return { completed: 0, active: 0, onHold: 0, planning: 0 };
     return {
       completed: allProjects.filter(p => p.status === 'Completed').length,
-      active: allProjects.filter(p => p.status !== 'Completed' && p.status !== 'On Hold').length,
+      active: allProjects.filter(p => p.status === 'Development' || p.status === 'Testing' || p.status === 'Design').length,
       onHold: allProjects.filter(p => p.status === 'On Hold').length,
       planning: allProjects.filter(p => p.status === 'Planning').length,
     }
@@ -77,16 +103,28 @@ export default function AdminProjectsPage() {
                <div className="mt-4 flex flex-col md:flex-row items-center gap-4">
                 <div className="relative flex-1 w-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="प्रोजेक्ट ID, नाम, या क्लाइंट से खोजें..." className="pl-10 w-full" />
+                  <Input 
+                    placeholder="प्रोजेक्ट ID, नाम, या क्लाइंट से खोजें..." 
+                    className="pl-10 w-full"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
                 <div className="flex items-center gap-4 flex-wrap">
                   <span className="text-sm font-medium shrink-0">फ़िल्टर:</span>
-                  {projectStatuses.map((status) => (
-                     <div key={status} className="flex items-center space-x-2">
-                       <Checkbox id={`filter-${status.toLowerCase().replace(' ', '-')}`} />
-                       <Label htmlFor={`filter-${status.toLowerCase().replace(' ', '-')}`} className="text-sm font-normal">{status}</Label>
-                     </div>
-                  ))}
+                  {ALL_STATUSES.map((status) => {
+                     const id = `filter-${status.toLowerCase().replace(' ', '-')}`;
+                     return (
+                       <div key={status} className="flex items-center space-x-2">
+                         <Checkbox 
+                           id={id} 
+                           onCheckedChange={(checked) => handleStatusChange(status, checked)}
+                           checked={selectedStatuses.includes(status)}
+                         />
+                         <Label htmlFor={id} className="text-sm font-normal">{status}</Label>
+                       </div>
+                     )
+                  })}
                 </div>
               </div>
             </CardHeader>
@@ -95,7 +133,7 @@ export default function AdminProjectsPage() {
                 <div className="flex justify-center items-center h-64">
                   <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
-              ) : allProjects && allProjects.length > 0 ? (
+              ) : filteredProjects && filteredProjects.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -110,7 +148,7 @@ export default function AdminProjectsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {allProjects?.map((project) => (
+                  {filteredProjects.map((project) => (
                     <TableRow key={project.id}>
                       <TableCell className="font-medium">{project.name}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{project.clientId}</TableCell>
@@ -148,8 +186,8 @@ export default function AdminProjectsPage() {
               </Table>
               ) : (
                 <div className="text-center py-10 text-muted-foreground">
-                  <p>No projects found in the database.</p>
-                  <p className="text-sm">Try creating a project as a client to see it appear here.</p>
+                  <p>No projects match your search or filter criteria.</p>
+                  <p className="text-sm">Try creating a project or clearing your filters.</p>
                 </div>
               )}
             </CardContent>
