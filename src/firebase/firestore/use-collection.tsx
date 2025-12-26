@@ -52,19 +52,21 @@ export interface InternalQuery extends Query<DocumentData> {
  * @returns {UseCollectionResult<T>} Object with data, isLoading, error.
  */
 export function useCollection<T = any>(
-    memoizedTargetRefOrQuery: ((CollectionReference<DocumentData> | Query<DocumentData>) & {__memo?: boolean})  | null | undefined,
+    memoizedTargetRefOrQuery: CollectionReference<DocumentData> | Query<DocumentData> | null | undefined,
 ): UseCollectionResult<T> {
   type ResultItemType = WithId<T>;
   type StateDataType = ResultItemType[] | null;
 
   const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Start as true
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
+    // CRITICAL FIX: If the query is not ready, do nothing.
+    // This prevents attempts to query the root path.
     if (!memoizedTargetRefOrQuery) {
+      setIsLoading(true); // Keep loading until a valid query is provided
       setData(null);
-      setIsLoading(true); // Set to true while waiting for a valid query
       setError(null);
       return;
     }
