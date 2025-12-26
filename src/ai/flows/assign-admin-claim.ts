@@ -28,23 +28,19 @@ const AssignAdminClaimOutputSchema = z.object({
 });
 export type AssignAdminClaimOutput = z.infer<typeof AssignAdminClaimOutputSchema>;
 
-const assignAdminClaimFlow = ai.defineFlow(
-  {
-    name: 'assignAdminClaimFlow',
-    inputSchema: AssignAdminClaimInputSchema,
-    outputSchema: AssignAdminClaimOutputSchema,
-  },
-  async ({ email }) => {
+/**
+ * Manually assigns an admin claim to a user. This can be called from a secure environment.
+ */
+export async function assignAdminClaim(input: AssignAdminClaimInput): Promise<AssignAdminClaimOutput> {
     try {
-      const user = await admin.auth().getUserByEmail(email);
+      const user = await admin.auth().getUserByEmail(input.email);
       if (user) {
-        // Set custom user claims
         await admin.auth().setCustomUserClaims(user.uid, { admin: true });
-        const message = `Successfully set admin claim for ${email}`;
+        const message = `Successfully set admin claim for ${input.email}`;
         console.log(message);
         return { success: true, message };
       } else {
-        const message = `User with email ${email} not found.`;
+        const message = `User with email ${input.email} not found.`;
         console.log(message);
         return { success: false, message };
       }
@@ -52,23 +48,13 @@ const assignAdminClaimFlow = ai.defineFlow(
       console.error('Error setting custom claim:', error);
       return { success: false, message: error.message };
     }
-  }
-);
-
-export async function assignAdminClaim(input: AssignAdminClaimInput): Promise<AssignAdminClaimOutput> {
-  // We only want to assign admin claim if the email is the designated admin email.
-  if (input.email === 'admin@example.com') {
-    return await assignAdminClaimFlow(input);
-  } else {
-    return { success: false, message: 'Email is not a designated admin email.' };
-  }
 }
 
 /**
- * This flow is triggered on user creation (conceptually).
- * In a real Firebase project, you would set up a Cloud Function trigger.
- * Here, we define the logic that would run inside that trigger.
- * It automatically assigns an admin role to a specific email address.
+ * This flow is designed to be triggered on user creation via a Firebase Function.
+ * In a real Firebase project, you would deploy this logic as a Cloud Function
+ * listening to the `functions.auth.user().onCreate()` trigger.
+ * It automatically assigns an admin role to a specific email address upon account creation.
  */
 ai.defineFlow(
   {

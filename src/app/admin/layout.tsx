@@ -14,13 +14,14 @@ export default function AdminPortalLayout({ children }: { children: ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    // Wait until user loading and admin status check is complete
+    // Wait until both user loading and admin status check is complete
     if (!isUserLoading && !isAdminLoading) {
       if (!user) {
         // If no user is logged in, redirect to login
         router.push('/login');
       } else if (!isAdmin) {
         // If user is logged in but is not an admin, redirect to client dashboard
+        console.warn('User is not an admin. Redirecting to client dashboard.');
         router.push('/client/dashboard');
       }
     }
@@ -36,10 +37,20 @@ export default function AdminPortalLayout({ children }: { children: ReactNode })
     );
   }
 
-  // If user is an admin, render the admin layout
+  // Only render the admin layout if the user is a verified admin
+  if (isAdmin) {
+    return (
+      <PortalLayout sidebarContent={<AdminSidebar />}>
+        {children}
+      </PortalLayout>
+    );
+  }
+
+  // Fallback loading screen while redirecting
   return (
-    <PortalLayout sidebarContent={<AdminSidebar />}>
-      {children}
-    </PortalLayout>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-4">Redirecting...</p>
+      </div>
   );
 }

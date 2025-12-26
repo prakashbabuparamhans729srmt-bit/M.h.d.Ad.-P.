@@ -179,21 +179,9 @@ export const useFirebaseApp = (): FirebaseApp => {
   return firebaseApp;
 };
 
-type MemoFirebase<T> = T & { __memo?: boolean };
-
 export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | null {
-  const memoized = useMemo(factory, deps);
-
-  // If the factory returns null/undefined (e.g. firestore isn't ready), just return it.
-  if (!memoized) {
-    return null;
-  }
-  
-  if (typeof memoized === 'object' && memoized !== null) {
-    (memoized as MemoFirebase<T>).__memo = true;
-  }
-  
-  return memoized;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(factory, deps);
 }
 
 
