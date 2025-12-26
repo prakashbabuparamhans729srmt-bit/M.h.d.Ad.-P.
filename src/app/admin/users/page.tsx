@@ -83,7 +83,7 @@ export default function AdminUsersPage() {
         ) : error ? (
            <div className="text-center py-10 text-destructive">
             <p>Error loading users: Permission denied.</p>
-            <p className="text-sm text-muted-foreground">Please ensure you are logged in as an admin with the correct custom claims.</p>
+            <p className="text-sm text-muted-foreground">Please ensure you are logged in as an admin with the correct custom claims (`admin: true`).</p>
           </div>
         ) : userList && userList.length > 0 ? (
           <Table>

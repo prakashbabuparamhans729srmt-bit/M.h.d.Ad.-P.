@@ -11,20 +11,25 @@ service cloud.firestore {
     // Rules for the 'users' collection
     match /users/{userId} {
       // Admins can read and write to any user document.
+      allow read, write: if isAdmin();
       // A specific user can only read or write their own document.
-      allow read, write: if isAdmin() || request.auth.uid == userId;
-
-      // The 'list' operation is handled on the collection itself.
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Allow admins to list the entire 'users' collection.
+    // This is crucial for the User Management page.
+    match /users {
       allow list: if isAdmin();
     }
+
 
     // Rules for the 'projects' subcollection, accessible as a collection group.
     // This allows an admin to query across all projects from all users.
     match /{path=**}/projects/{projectId} {
        // Admins can read/list any project from any user.
-       allow read, list: if isAdmin();
+       allow read: if isAdmin();
 
-       // A user can write to their own projects.
+       // A user can read/write to their own projects.
        // The path[1] corresponds to the {userId} in '/users/{userId}/...'.
        // An admin can also write to any project.
        allow write: if request.auth.uid == path[1] || isAdmin();
