@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Briefcase, DollarSign, TrendingUp, AlertTriangle, HeartPulse, Activity, Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useFirestore, useCollection, useMemoFirebase, useCollectionGroup } from '@/firebase';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, collectionGroup, query } from 'firebase/firestore';
 
 export default function AdminDashboardPage() {
@@ -16,6 +16,7 @@ export default function AdminDashboardPage() {
 
   const allProjectsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
+    // Corrected the query to be on the 'projects' collection group
     return query(collectionGroup(firestore, 'projects'));
   }, [firestore]);
 
