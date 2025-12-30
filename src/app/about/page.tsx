@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { PublicLayout } from '@/components/layout/public-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,8 +102,18 @@ export default function AboutUsPage() {
               <Card key={member.name} className="text-center p-6">
                 <div className="flex justify-center mb-4">
                   <Avatar className="h-24 w-24 border-4 border-primary/20">
-                    {memberImage && <AvatarImage src={memberImage.imageUrl} alt={member.name} data-ai-hint={memberImage.imageHint} />}
-                    <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                     {memberImage ? (
+                      <Image
+                        src={memberImage.imageUrl}
+                        alt={member.name}
+                        width={memberImage.width || 150}
+                        height={memberImage.height || 150}
+                        className="rounded-full object-cover"
+                        data-ai-hint={memberImage.imageHint}
+                      />
+                    ) : (
+                      <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                    )}
                   </Avatar>
                 </div>
                 <h3 className="text-xl font-bold font-headline">{member.name}</h3>
