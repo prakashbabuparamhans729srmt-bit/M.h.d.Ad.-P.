@@ -63,7 +63,7 @@ export function useCollection<T = any>(
 
   useEffect(() => {
     // CRITICAL FIX: If the query is not ready, do nothing.
-    // This prevents attempts to query the root path.
+    // This prevents attempts to query the root path when user is not logged in.
     if (!memoizedTargetRefOrQuery) {
       setIsLoading(true); // Keep loading until a valid query is provided
       setData(null);
