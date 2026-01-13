@@ -3,11 +3,11 @@
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, initializeFirestore, memoryLocalCache } from 'firebase/firestore'
+import { getFirestore, initializeFirestore, memoryLocalCache, Firestore } from 'firebase/firestore'
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
-  let firebaseApp;
+  let firebaseApp: FirebaseApp;
   if (!getApps().length) {
     try {
       // Attempt to initialize via Firebase App Hosting environment variables
@@ -22,10 +22,19 @@ export function initializeFirebase() {
     firebaseApp = getApp();
   }
 
-  // Use initializeFirestore with memory cache to avoid IndexedDB issues in restricted environments
-  const firestore = initializeFirestore(firebaseApp, {
-    localCache: memoryLocalCache(),
-  });
+  let firestore: Firestore;
+  try {
+    // Attempt to initialize Firestore with memory cache.
+    // This will throw an error if it has already been initialized,
+    // which is expected during hot-reloads in development.
+    firestore = initializeFirestore(firebaseApp, {
+      localCache: memoryLocalCache(),
+    });
+  } catch (e) {
+    // If it's already initialized, just get the existing instance.
+    firestore = getFirestore(firebaseApp);
+  }
+
 
   return {
     firebaseApp,
