@@ -21,7 +21,7 @@ export function Logo({ className }: LogoProps) {
   return (
     <Link href="/" className={cn("flex items-center gap-2", state === 'collapsed' && "justify-center", className)}>
       <Network className="h-6 w-6 text-primary" />
-      <span className={cn("text-xl font-bold font-headline text-foreground", state === 'collapsed' && "hidden")}>VyaparSphere</span>
+      <span className={cn("text-xl font-bold font-headline text-foreground", state === 'collapsed' && "hidden")}>VyaparBandhu</span>
     </Link>
   );
 }

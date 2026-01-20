@@ -4,8 +4,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
-  title: 'VyaparSphere',
-  description: 'Your Business Sphere, Amplified.',
+  title: 'VyaparBandhu',
+  description: 'छोटे व्यवसाय, बड़े सपने',
 };
 
 export default function RootLayout({

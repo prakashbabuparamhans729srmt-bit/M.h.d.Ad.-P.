@@ -10,8 +10,8 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 174 96% 48%; /* #07f1d6 */
-    --primary-foreground: 205.7 20% 13.5%; /* #161C21 */
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -22,24 +22,24 @@
     --destructive-foreground: 210 40% 98%;
     --border: 205.7 15.8% 92.9%;
     --input: 205.7 15.8% 92.9%;
-    --ring: 174 96% 48%;
+    --ring: 217 91% 60%;
     --radius: 0.5rem;
 
-    --chart-1: 174 96% 48%;
+    --chart-1: 217 91% 60%;
     --chart-2: 205.7 20% 40%;
-    --chart-3: 174 50% 65%;
+    --chart-3: 217 50% 65%;
     --chart-4: 205.7 15% 75%;
     --chart-5: 205.7 10% 55%;
 
     /* Sidebar for Admin/Client Portals */
     --sidebar-background: 205.7 20% 13.5%; /* #161C21 */
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 174 96% 48%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 205.7 20% 13.5%;
-    --sidebar-accent: 174 96% 48%;
+    --sidebar-accent: 217 91% 60%;
     --sidebar-accent-foreground: 205.7 20% 13.5%;
     --sidebar-border: 204 9.5% 11.2%;
-    --sidebar-ring: 174 96% 48%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .dark {
@@ -49,8 +49,8 @@
     --card-foreground: 0 0% 98%;
     --popover: 205.7 20% 13.5%; /* #161C21 */
     --popover-foreground: 0 0% 98%;
-    --primary: 174 96% 48%; /* #07f1d6 */
-    --primary-foreground: 205.7 20% 13.5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
     --secondary: 204 9.5% 11.2%;
     --secondary-foreground: 0 0% 98%;
     --muted: 204 9.5% 11.2%;
@@ -61,17 +61,17 @@
     --destructive-foreground: 0 0% 98%;
     --border: 204 9.5% 11.2%;
     --input: 204 9.5% 11.2%;
-    --ring: 174 96% 48%;
+    --ring: 217 91% 60%;
     
     /* Sidebar dark colors */
     --sidebar-background: 0 0% 2.7%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 174 96% 48%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 205.7 20% 13.5%;
-    --sidebar-accent: 174 96% 48%;
+    --sidebar-accent: 217 91% 60%;
     --sidebar-accent-foreground: 205.7 20% 13.5%;
     --sidebar-border: 204 9.5% 11.2%;
-    --sidebar-ring: 174 96% 48%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -92,5 +92,51 @@
   html {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+  }
+  
+  /* Animations from User */
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ripple { 0% { transform: scale(0, 0); opacity: 0.5; } 20% { transform: scale(25, 25); opacity: 0.3; } 100% { opacity: 0; transform: scale(40, 40); } }
+
+  .shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  .pulse { animation: pulse 2s infinite; }
+  .bounce { animation: bounce 0.5s ease infinite; }
+  .page-enter { animation: slideInRight 0.3s ease; }
+  .page-exit { animation: slideInLeft 0.3s ease; }
+
+  /* Ripple Effect */
+  .ripple {
+    @apply relative overflow-hidden;
+  }
+  .ripple::after {
+    content: '';
+    @apply absolute top-1/2 left-1/2;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+  }
+  .ripple:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
