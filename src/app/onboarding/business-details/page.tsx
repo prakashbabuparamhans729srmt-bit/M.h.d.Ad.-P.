@@ -93,8 +93,8 @@ export default function BusinessDetailsPage() {
             </CardContent>
           </Card>
 
-          <Button className="w-full h-12 text-lg">
-            सेटअप पूरा करें
+          <Button className="w-full h-12 text-lg" asChild>
+            <Link href="/dashboard">सेटअप पूरा करें</Link>
           </Button>
         </main>
       </div>
