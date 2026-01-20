@@ -60,7 +60,7 @@ export default function WelcomePage() {
 
         <div className="w-full space-y-4 animate-in fade-in-0 slide-in-from-bottom-5 delay-500 duration-700">
           <Button className="w-full h-12 text-lg ripple" asChild>
-            <Link href="/login">मोबाइल नंबर से जारी रखें</Link>
+            <Link href="/onboarding/business-type">मोबाइल नंबर से जारी रखें</Link>
           </Button>
           <div className="flex items-center gap-4">
             <hr className="w-full border-border" />
