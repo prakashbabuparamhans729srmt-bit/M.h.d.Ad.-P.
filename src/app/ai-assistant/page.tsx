@@ -6,7 +6,8 @@ import {
   Send,
   Bot,
   CheckCircle2,
-  Settings
+  Settings,
+  MessageSquareQuestion,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -60,9 +61,12 @@ export default function AiAssistantPage() {
                     <Send className="h-4 w-4"/>
                 </Button>
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="space-y-2 mt-4">
                 {examplePrompts.map((prompt, i) => (
-                    <Badge key={i} variant="outline" className="cursor-pointer">{prompt}</Badge>
+                    <Card key={i} className="p-3 flex items-center gap-3 cursor-pointer hover:bg-accent transition-colors">
+                        <MessageSquareQuestion className="h-5 w-5 text-primary flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{prompt}</span>
+                    </Card>
                 ))}
             </div>
         </div>
