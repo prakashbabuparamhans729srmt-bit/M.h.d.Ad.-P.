@@ -5,7 +5,6 @@ import {
   Save,
   FolderOpen,
   Zap,
-  Search,
   ChevronDown,
   Edit,
   Camera,
@@ -15,14 +14,22 @@ import {
   Banknote,
   CreditCard,
   Wallet,
-  Gift,
   CheckCircle,
+  Repeat,
+  Clipboard,
+  Users,
+  ShoppingBasket,
+  FileText,
+  Clock,
+  UserPlus,
+  ListChecks,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const customer = {
   name: 'अमित शर्मा',
@@ -37,28 +44,59 @@ const items = [
   { name: 'तेल', price: '₹200', qty: 1, suggestion: 'ट्रेंडिंग आइटम' },
 ];
 
-export default function SmartInvoiceCreatorPage() {
+const bulkCustomers = [
+    { name: 'अमित शर्मा', items: [{ name: 'चावल', qty: '2kg' }, { name: 'दाल', qty: '1kg' }], total: '₹280' },
+    { name: 'राजेश कुमार', items: [{ name: 'तेल', qty: '1L' }, { name: 'साबुन', qty: '2' }], total: '₹250' },
+];
+
+const activeSubscriptions = [
+    { id: 1, customer: 'राजेश', item: 'दैनिक दूध', amount: '₹60/दिन', next: 'कल' },
+    { id: 2, customer: 'सीमा', item: 'साप्ताहिक फल', amount: '₹500/सप्ताह', next: 'Mon' },
+    { id: 3, customer: 'अमित', item: 'मासिक राशन', amount: '₹2,000/महीना', next: '1st' },
+]
+
+
+export default function AdvancedBillingPage() {
   return (
     <div className="p-4 space-y-6 animate-in fade-in-50 duration-500">
       <header className="flex justify-between items-center">
         <Button variant="ghost" size="icon">
           <ArrowLeft />
         </Button>
-        <h1 className="text-xl font-bold font-headline">स्मार्ट बिल क्रिएटर</h1>
+        <h1 className="text-xl font-bold font-headline">उन्नत बिलिंग</h1>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" title="Save">
             <Save />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" title="Open">
             <FolderOpen />
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1">
-            <Zap className="h-4 w-4" /> Quick Bill
           </Button>
         </div>
       </header>
 
-      <main className="space-y-6">
+      <Tabs defaultValue="smart-bill" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="smart-bill">स्मार्ट बिल</TabsTrigger>
+          <TabsTrigger value="bulk-billing"><Clipboard className="mr-2 h-4 w-4"/>बल्क बिलिंग</TabsTrigger>
+          <TabsTrigger value="recurring-billing"><Repeat className="mr-2 h-4 w-4"/>आवर्ती बिल</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="smart-bill" className="mt-6">
+            <SmartInvoiceCreator />
+        </TabsContent>
+        <TabsContent value="bulk-billing" className="mt-6">
+            <BulkBilling />
+        </TabsContent>
+        <TabsContent value="recurring-billing" className="mt-6">
+            <RecurringBilling />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+const SmartInvoiceCreator = () => (
+    <main className="space-y-6">
         <div>
           <Label htmlFor="customer-search">🔍 ग्राहक खोजें या नया जोड़ें</Label>
           <Card className="mt-2">
@@ -145,15 +183,125 @@ export default function SmartInvoiceCreatorPage() {
         </div>
 
          <Button className="w-full h-12 text-lg">बिल जनरेट करें और शेयर करें</Button>
+    </main>
+);
 
-      </main>
+const BulkBilling = () => (
+    <div className="space-y-6">
+        <div className="text-center">
+            <h2 className="text-lg font-semibold">बल्क बिलिंग</h2>
+            <p className="text-muted-foreground text-sm">एक साथ 5 ग्राहकों तक के बिल बनाएं</p>
+        </div>
+
+        {bulkCustomers.map((cust, index) => (
+            <div key={index}>
+                <Label>{`ग्राहक ${index+1}: ${cust.name}`}</Label>
+                <Card className="mt-1">
+                    <CardContent className="p-3 space-y-2">
+                        {cust.items.map((item, itemIndex) => (
+                           <div key={itemIndex} className="flex justify-between text-sm">
+                               <span>{`${item.name} - ${item.qty}`}</span>
+                               {itemIndex === 0 && <Button variant="ghost" size="icon" className="h-7 w-7"><Edit className="h-4 w-4"/></Button>}
+                           </div>
+                        ))}
+                        <Separator />
+                        <p className="font-bold text-right">कुल: {cust.total}</p>
+                    </CardContent>
+                </Card>
+            </div>
+        ))}
+         <Card>
+            <CardContent className="p-3">
+                <Button variant="link" className="w-full p-0 h-auto">
+                    + ग्राहक 3: [नया ग्राहक जोड़ें]
+                </Button>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base flex items-center"><FileText className="mr-2 h-4 w-4"/> बल्क समरी:</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+                <div className="flex justify-between"><span className="flex items-center gap-1"><Users className="h-4 w-4"/>कुल ग्राहक:</span> <span className="font-bold">2</span></div>
+                <div className="flex justify-between"><span className="flex items-center gap-1"><ShoppingBasket className="h-4 w-4"/>कुल बिक्री:</span> <span className="font-bold">₹530</span></div>
+                <div className="flex justify-between"><span className="flex items-center gap-1"><FileText className="h-4 w-4"/>औसत बिल:</span> <span className="font-bold">₹265</span></div>
+                <div className="flex justify-between"><span className="flex items-center gap-1"><Clock className="h-4 w-4"/>अनुमानित समय बचत:</span> <span className="font-bold">15 मिनट</span></div>
+            </CardContent>
+        </Card>
+
+        <div className="space-y-3">
+            <Button className="w-full h-12 text-lg">सभी बिल एक साथ जनरेट करें</Button>
+            <Button variant="secondary" className="w-full">WhatsApp ब्रॉडकास्ट</Button>
+        </div>
     </div>
-  );
-}
+);
 
-// Add a new Label component to be used in this page
+const RecurringBilling = () => (
+    <div className="space-y-6">
+        <div className="text-center">
+            <h2 className="text-lg font-semibold">आवर्ती/सब्सक्रिप्शन बिल</h2>
+            <p className="text-muted-foreground text-sm">स्वचालित मासिक, साप्ताहिक या दैनिक बिल सेट करें</p>
+        </div>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base flex items-center"><UserPlus className="mr-2 h-4 w-4"/> सेटअप नया सब्सक्रिप्शन:</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+                <Input placeholder="ग्राहक: अमित शर्मा" />
+                <Input placeholder="आइटम: मासिक राशन" />
+                <Input placeholder="अवधि: हर महीने की 1 तारीख" />
+                <Input placeholder="मूल्य: ₹2,000/महीना" />
+                <div className="flex items-center space-x-2">
+                    <Checkbox id="auto-reminder" defaultChecked/>
+                    <label htmlFor="auto-reminder" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">ऑटो-रिमाइंडर: बिल से 2 दिन पहले</label>
+                </div>
+                 <div className="flex items-center space-x-2">
+                    <Checkbox id="auto-pay" />
+                    <label htmlFor="auto-pay" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">ऑटो-पेमेंट: UPI ऑटोपे</label>
+                </div>
+                <Button className="w-full mt-2">सब्सक्रिप्शन जोड़ें</Button>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base flex items-center"><ListChecks className="mr-2 h-4 w-4"/> एक्टिव सब्सक्रिप्शन:</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                {activeSubscriptions.map(sub => (
+                    <div key={sub.id} className="text-sm p-2 rounded-md bg-muted/50">
+                        <div className="flex justify-between">
+                            <span className="font-semibold">{`${sub.id}. ${sub.customer} - ${sub.item}`}</span>
+                            <span className="font-bold">{sub.amount}</span>
+                        </div>
+                        <p className="text-xs text-primary">अगला: {sub.next}</p>
+                    </div>
+                ))}
+            </CardContent>
+        </Card>
+        
+         <Card>
+            <CardHeader>
+                <CardTitle className="text-base flex items-center"><Banknote className="mr-2 h-4 w-4"/> इस महीने का अनुमान:</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-1">
+                 <p>• सब्सक्रिप्शन: <span className="font-bold">₹15,000</span></p>
+                 <p>• ऑटो-कलेक्शन: <span className="font-bold">85% सफलता दर</span></p>
+            </CardContent>
+        </Card>
+
+    </div>
+);
+
+
 const Label = ({ htmlFor, className, children }: { htmlFor?: string, className?: string, children: React.ReactNode }) => (
     <label htmlFor={htmlFor} className={`text-base font-semibold text-foreground ${className}`}>
         {children}
     </label>
+);
+
+const Checkbox = ({ id, ...props }: { id: string, [key: string]: any }) => (
+    <input type="checkbox" id={id} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" {...props} />
 );
