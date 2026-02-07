@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -21,7 +20,11 @@ const registerSchema = z.object({
   phone: z.string().optional(),
 });
 
-type RegisterFormInputs = z.infer<typeof registerSchema>;
+const loginSchema = z.object({
+  email: z.string().email({ message: 'अमान्य ईमेल पता।' }),
+  password: z.string().min(1, { message: 'पासवर्ड आवश्यक है।' }),
+});
+
 
 const GoogleIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -38,7 +41,8 @@ const GoogleIcon = () => (
 );
 
 
-export default function RegisterPage() {
+export default function AuthPage() {
+  const [isLoginView, setIsLoginView] = useState(false);
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdmin();
@@ -46,37 +50,54 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const form = useForm<RegisterFormInputs>({
-    resolver: zodResolver(registerSchema),
+  const currentSchema = isLoginView ? loginSchema : registerSchema;
+  type FormInputs = z.infer<typeof currentSchema>;
+
+  const form = useForm<FormInputs>({
+    resolver: zodResolver(currentSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
       email: '',
       password: '',
+      ...(isLoginView ? {} : { firstName: '', lastName: '', phone: '' }),
     },
   });
+
+  useEffect(() => {
+    form.reset();
+    setAuthError(null);
+  }, [isLoginView, form]);
   
   useEffect(() => {
     if (!isUserLoading && !isAdminLoading && user) {
-      if (isAdmin) {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/client/dashboard');
-      }
+        router.push(isAdmin ? '/admin/dashboard' : '/client/dashboard');
     }
   }, [user, isUserLoading, isAdmin, isAdminLoading, router]);
 
-  const onSubmit: SubmitHandler<RegisterFormInputs> = async (data) => {
+  const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     setIsSubmitting(true);
     setAuthError(null);
     try {
-      await createUserWithEmailAndPassword(auth, data.email, data.password);
-      // The onAuthStateChanged listener will handle the redirect.
-    } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        setAuthError('यह ईमेल पहले से पंजीकृत है। कृपया लॉग इन करें।');
+      if (isLoginView) {
+        const { email, password } = data as z.infer<typeof loginSchema>;
+        await signInWithEmailAndPassword(auth, email, password);
       } else {
-        setAuthError(error.message);
+        const { email, password } = data as z.infer<typeof registerSchema>;
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+    } catch (error: any) {
+      switch (error.code) {
+        case 'auth/user-not-found':
+          setAuthError('इस ईमेल के लिए कोई उपयोगकर्ता नहीं मिला।');
+          break;
+        case 'auth/wrong-password':
+          setAuthError('गलत पासवर्ड। कृपया पुनः प्रयास करें।');
+          break;
+        case 'auth/email-already-in-use':
+          setAuthError('यह ईमेल पहले से पंजीकृत है। कृपया लॉग इन करें।');
+          break;
+        default:
+          setAuthError('एक त्रुटि हुई। कृपया पुनः प्रयास करें।');
+          console.error('Authentication Error:', error);
       }
     } finally {
       setIsSubmitting(false);
@@ -123,8 +144,8 @@ export default function RegisterPage() {
         {/* Right Column */}
         <div className="flex flex-col justify-center p-8 sm:p-12 relative">
            <div className="mx-auto w-full max-w-md">
-            <h2 className="text-3xl font-bold font-headline text-white">एक खाता बनाएं</h2>
-            <p className="mt-2 text-gray-400">शुरू करने के लिए नीचे अपना विवरण दर्ज करें</p>
+            <h2 className="text-3xl font-bold font-headline text-white">{isLoginView ? 'लॉग इन करें' : 'एक खाता बनाएं'}</h2>
+            <p className="mt-2 text-gray-400">{isLoginView ? 'जारी रखने के लिए लॉग इन करें।' : 'शुरू करने के लिए नीचे अपना विवरण दर्ज करें'}</p>
 
             <div className="grid grid-cols-2 gap-4 mt-8">
                 <Button variant="outline" className="bg-transparent border-gray-700 hover:bg-gray-800 text-white">
@@ -145,7 +166,8 @@ export default function RegisterPage() {
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    {!isLoginView && (
+                      <div className="grid grid-cols-2 gap-4">
                          <FormField
                             control={form.control}
                             name="firstName"
@@ -183,6 +205,7 @@ export default function RegisterPage() {
                             )}
                         />
                     </div>
+                    )}
 
                     <FormField
                         control={form.control}
@@ -203,24 +226,26 @@ export default function RegisterPage() {
                         )}
                     />
 
-                     <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel className="text-gray-400">फ़ोन नंबर (वैकल्पिक)</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    type="tel" 
-                                    placeholder="+91-XXXXXXXXXX" 
-                                    className="bg-gray-900 border-gray-700 text-white" 
-                                    {...field} 
-                                />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                     {!isLoginView && (
+                        <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel className="text-gray-400">फ़ोन नंबर (वैकल्पिक)</FormLabel>
+                                <FormControl>
+                                    <Input 
+                                        type="tel" 
+                                        placeholder="+91-XXXXXXXXXX" 
+                                        className="bg-gray-900 border-gray-700 text-white" 
+                                        {...field} 
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                     )}
 
                     <FormField
                         control={form.control}
@@ -235,13 +260,13 @@ export default function RegisterPage() {
                                         {...field} 
                                     />
                                 </FormControl>
-                                <p className="text-xs text-gray-500 mt-1">कम से कम 8 अक्षर का होना चाहिए।</p>
+                                {!isLoginView && <p className="text-xs text-gray-500 mt-1">कम से कम 8 अक्षर का होना चाहिए।</p>}
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
                     
-                    {authError && <p className="text-sm font-medium text-red-500">{authError}</p>}
+                    {authError && <p className="text-sm font-medium text-destructive">{authError}</p>}
 
                     <Button 
                         type="submit" 
@@ -249,16 +274,16 @@ export default function RegisterPage() {
                         disabled={isSubmitting}
                     >
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        खाता बनाएं
+                        {isLoginView ? 'लॉग इन करें' : 'खाता बनाएं'}
                     </Button>
                 </form>
             </Form>
 
             <div className="mt-6 text-center text-sm">
-                <span className="text-gray-400">पहले से ही एक खाता है? </span>
-                <Link href="/login" className="font-semibold text-primary hover:underline">
-                  लॉग इन करें
-                </Link>
+                <span className="text-gray-400">{isLoginView ? 'अभी तक कोई खाता नहीं है? ' : 'पहले से ही एक खाता है? '}</span>
+                <button onClick={() => setIsLoginView(!isLoginView)} className="font-semibold text-primary hover:underline focus:outline-none">
+                  {isLoginView ? 'साइन अप करें' : 'लॉग इन करें'}
+                </button>
             </div>
            </div>
            <div className="absolute bottom-6 right-6">
