@@ -37,14 +37,14 @@ export default function NewEntryPage() {
 
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row animate-in fade-in-0 slide-in-from-bottom-10 delay-500 duration-700">
           <Button size="lg" className="w-full sm:w-auto h-12 text-base" asChild>
-            <Link href="/login">
+            <Link href="/login?view=signup">
               <Mail className="mr-2 h-5 w-5" />
               ईमेल से साइन अप करें
             </Link>
           </Button>
           <span className="text-muted-foreground hidden sm:block">या</span>
           <Button size="lg" variant="secondary" className="w-full sm:w-auto h-12 text-base" asChild>
-             <Link href="/login">
+             <Link href="/login?view=signup">
               <Smartphone className="mr-2 h-5 w-5" />
               मोबाइल से साइन अप करें
             </Link>
@@ -52,7 +52,7 @@ export default function NewEntryPage() {
         </div>
 
          <p className="mt-8 text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-10 delay-700 duration-700">
-          पहले से सदस्य हैं? <Link href="/login" className="font-semibold text-primary hover:underline">लॉग इन करें</Link>
+          पहले से सदस्य हैं? <Link href="/login?view=login" className="font-semibold text-primary hover:underline">लॉग इन करें</Link>
         </p>
 
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -40,9 +40,11 @@ const GoogleIcon = () => (
     </svg>
 );
 
-
-export default function AuthPage() {
-  const [isLoginView, setIsLoginView] = useState(false);
+function AuthPageComponent() {
+  const searchParams = useSearchParams();
+  const view = searchParams.get('view');
+  
+  const [isLoginView, setIsLoginView] = useState(view !== 'signup');
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdmin();
@@ -61,6 +63,11 @@ export default function AuthPage() {
       ...(isLoginView ? {} : { firstName: '', lastName: '', phone: '' }),
     },
   });
+  
+  // Effect to switch form view based on URL parameter
+  useEffect(() => {
+    setIsLoginView(view !== 'signup');
+  }, [view]);
 
   useEffect(() => {
     form.reset();
@@ -295,4 +302,12 @@ export default function AuthPage() {
       </div>
     </div>
   );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense>
+      <AuthPageComponent />
+    </Suspense>
+  )
 }
