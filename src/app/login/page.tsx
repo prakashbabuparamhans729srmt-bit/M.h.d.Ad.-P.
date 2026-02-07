@@ -7,10 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth, useUser, useAdmin } from '@/firebase';
+import { useAuth, useUser, useAdmin, useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, Github, HelpCircle, Network } from 'lucide-react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc } from 'firebase/firestore';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, { message: 'पहला नाम आवश्यक है।' }),
@@ -46,6 +47,7 @@ function AuthPageComponent() {
   
   const [isLoginView, setIsLoginView] = useState(view !== 'signup');
   const auth = useAuth();
+  const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdmin();
   const router = useRouter();
@@ -88,8 +90,22 @@ function AuthPageComponent() {
         const { email, password } = data as z.infer<typeof loginSchema>;
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        const { email, password } = data as z.infer<typeof registerSchema>;
-        await createUserWithEmailAndPassword(auth, email, password);
+        const { email, password, firstName, lastName } = data as z.infer<typeof registerSchema>;
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // After creating the user in Auth, create their profile in Firestore.
+        if (userCredential.user && firestore) {
+            const newUserProfile = {
+                id: userCredential.user.uid,
+                firstName,
+                lastName,
+                email: userCredential.user.email,
+                role: 'Client' // Assign a default role
+            };
+            const userDocRef = doc(firestore, 'users', userCredential.user.uid);
+            // This is a non-blocking write operation that includes our custom error handling
+            setDocumentNonBlocking(userDocRef, newUserProfile, {});
+        }
       }
     } catch (error: any) {
       switch (error.code) {
@@ -311,3 +327,5 @@ export default function AuthPage() {
     </Suspense>
   )
 }
+
+    
