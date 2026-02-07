@@ -229,7 +229,9 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com",
+      "github.com"
     ]
   },
   "firestore": {
@@ -354,4 +356,3 @@
     "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the VyaparSphere application. We prioritize path-based ownership for user-specific data and membership maps for collaborative data. Denormalization is used extensively to avoid `get()` calls in security rules, and structural segregation ensures homogeneous security postures within collections. The structure supports the required QAPs via segregation of content (e.g., public blog posts vs. user-specific projects) and using membership maps for project access control.\n\nSpecifically:\n\n*   **Users:** User data is stored in `/users/{userId}` using path-based ownership. This enables simple security rules based on `request.auth.uid`.\n*   **Projects:** Projects are stored under `/users/{clientId}/projects/{projectId}`, reflecting the 1:N relationship between users (as clients) and projects. This utilizes path-based ownership and simplifies access control.\n*   **Files:** Files are stored under `/users/{clientId}/projects/{projectId}/files/{fileId}`, maintaining the hierarchical structure and enabling straightforward security rules based on project ownership.\n*   **Timeline Summaries:** Timeline summaries are stored under `/users/{clientId}/projects/{projectId}/timelineSummaries/{timelineSummaryId}`, following the project hierarchy for easy management and security.\n*   **Blog Posts:** Blog posts are stored in a top-level `/blogPosts/{blogPostId}` collection. This segregation allows for different security rules (e.g., public read access, restricted write access).\n*   **Landing Pages:** Landing pages are stored in a top-level `/landingPages/{landingPageId}` collection, similar to blog posts, enabling distinct access controls.\n\nThis design ensures that access control can be implemented efficiently using Firestore security rules without relying on complex `get()` calls, thereby enhancing security, scalability, and debuggability."
   }
 }
-    

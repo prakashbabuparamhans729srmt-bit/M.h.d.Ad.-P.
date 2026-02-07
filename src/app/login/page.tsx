@@ -10,7 +10,15 @@ import { Input } from '@/components/ui/input';
 import { useAuth, useUser, useAdmin, useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, Github, HelpCircle, Network } from 'lucide-react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  getAdditionalUserInfo,
+  UserCredential,
+} from 'firebase/auth';
 import { doc } from 'firebase/firestore';
 
 const registerSchema = z.object({
@@ -43,9 +51,9 @@ const GoogleIcon = () => (
 
 function AuthPageComponent() {
   const searchParams = useSearchParams();
-  const view = searchParams.get('view');
+  const defaultView = searchParams.get('view') || 'login';
   
-  const [isLoginView, setIsLoginView] = useState(view !== 'signup');
+  const [isLoginView, setIsLoginView] = useState(defaultView !== 'signup');
   const auth = useAuth();
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
@@ -68,8 +76,9 @@ function AuthPageComponent() {
   
   // Effect to switch form view based on URL parameter
   useEffect(() => {
-    setIsLoginView(view !== 'signup');
-  }, [view]);
+    const currentView = searchParams.get('view') || 'login';
+    setIsLoginView(currentView !== 'signup');
+  }, [searchParams]);
 
   useEffect(() => {
     form.reset();
@@ -82,6 +91,46 @@ function AuthPageComponent() {
     }
   }, [user, isUserLoading, isAdmin, isAdminLoading, router]);
 
+  const handleSocialLogin = async (provider: GoogleAuthProvider | GithubAuthProvider) => {
+    if (!auth || !firestore) return;
+    setIsSubmitting(true);
+    setAuthError(null);
+    try {
+      const result: UserCredential = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const additionalInfo = getAdditionalUserInfo(result);
+
+      if (additionalInfo?.isNewUser) {
+        // If it's a new user, create a document in Firestore
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const nameParts = user.displayName?.split(' ') || ['New', 'User'];
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ');
+
+        const newUserProfile = {
+          id: user.uid,
+          firstName,
+          lastName: lastName || 'User',
+          email: user.email,
+          phone: user.phoneNumber || null,
+          role: 'Client',
+        };
+        // Use setDocumentNonBlocking to create the user profile
+        setDocumentNonBlocking(userDocRef, newUserProfile, {});
+      }
+      // The onAuthStateChanged listener will handle redirection automatically
+    } catch (error: any) {
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        setAuthError('An account already exists with this email. Please sign in using the original method.');
+      } else {
+        setAuthError('An error occurred during social sign-in. Please try again.');
+        console.error('Social Login Error:', error);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     setIsSubmitting(true);
     setAuthError(null);
@@ -93,7 +142,6 @@ function AuthPageComponent() {
         const { email, password, firstName, lastName, phone } = data as z.infer<typeof registerSchema>;
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // After creating the user in Auth, create their profile in Firestore.
         if (userCredential.user && firestore) {
             const newUserProfile = {
                 id: userCredential.user.uid,
@@ -101,10 +149,9 @@ function AuthPageComponent() {
                 lastName,
                 email: userCredential.user.email,
                 phone: phone || null,
-                role: 'Client' // Assign a default role
+                role: 'Client'
             };
             const userDocRef = doc(firestore, 'users', userCredential.user.uid);
-            // This is a non-blocking write operation that includes our custom error handling
             setDocumentNonBlocking(userDocRef, newUserProfile, {});
         }
       }
@@ -172,11 +219,11 @@ function AuthPageComponent() {
             <p className="mt-2 text-gray-400">{isLoginView ? 'जारी रखने के लिए लॉग इन करें।' : 'शुरू करने के लिए नीचे अपना विवरण दर्ज करें'}</p>
 
             <div className="grid grid-cols-2 gap-4 mt-8">
-                <Button variant="outline" className="bg-transparent border-gray-700 hover:bg-gray-800 text-white">
+                <Button variant="outline" className="bg-transparent border-gray-700 hover:bg-gray-800 text-white" onClick={() => handleSocialLogin(new GoogleAuthProvider())} disabled={isSubmitting}>
                     <GoogleIcon />
                     Google
                 </Button>
-                <Button variant="outline" className="bg-transparent border-gray-700 hover:bg-gray-800 text-white">
+                <Button variant="outline" className="bg-transparent border-gray-700 hover:bg-gray-800 text-white" onClick={() => handleSocialLogin(new GithubAuthProvider())} disabled={isSubmitting}>
                     <Github />
                     GitHub
                 </Button>
@@ -307,9 +354,9 @@ function AuthPageComponent() {
                 <p className="text-gray-400">{isLoginView ? 'अभी तक कोई खाता नहीं है? ' : 'पहले से ही एक खाता है? '}
                     <button 
                         onClick={() => {
-                            const newView = !isLoginView;
-                            setIsLoginView(newView);
-                            const newPath = `/login?view=${newView ? 'login' : 'signup'}`;
+                            const newViewIsLogin = !isLoginView;
+                            setIsLoginView(newViewIsLogin);
+                            const newPath = `/login?view=${newViewIsLogin ? 'login' : 'signup'}`;
                             window.history.pushState({}, '', newPath);
                         }} 
                         className="font-semibold text-primary hover:underline focus:outline-none"
@@ -337,5 +384,3 @@ export default function AuthPage() {
     </Suspense>
   )
 }
-
-    
