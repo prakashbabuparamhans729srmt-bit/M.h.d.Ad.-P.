@@ -93,12 +93,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#0D1117] text-white">
+    <div className="min-h-screen w-full bg-[#070707] text-white">
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
         {/* Left Column */}
-        <div className="hidden md:flex flex-col justify-center p-12 bg-gradient-to-br from-[#00A99D] via-[#3A378D] to-[#2B2A7A] text-white">
+        <div className="hidden md:flex flex-col justify-center p-12 bg-gradient-to-br from-[#07F1D6] via-[#161C21] to-[#070707] text-white">
             <div className="flex items-center gap-3 mb-6">
-                <Network className="h-8 w-8" />
+                <Network className="h-8 w-8 text-white" />
                 <span className="text-2xl font-bold font-headline">Hajaro Grahako</span>
             </div>
             <h1 className="font-headline text-4xl font-bold leading-tight">Get Started with Us</h1>
@@ -245,7 +245,7 @@ export default function RegisterPage() {
 
                     <Button 
                         type="submit" 
-                        className="w-full h-12 text-base bg-[#16E4B4] text-black font-bold hover:bg-[#16E4B4]/90" 
+                        className="w-full h-12 text-base bg-primary text-primary-foreground font-bold hover:bg-primary/90" 
                         disabled={isSubmitting}
                     >
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -256,13 +256,13 @@ export default function RegisterPage() {
 
             <div className="mt-6 text-center text-sm">
                 <span className="text-gray-400">पहले से ही एक खाता है? </span>
-                <Link href="/login" className="font-semibold text-[#16E4B4] hover:underline">
+                <Link href="/login" className="font-semibold text-primary hover:underline">
                   लॉग इन करें
                 </Link>
             </div>
            </div>
            <div className="absolute bottom-6 right-6">
-                <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full bg-white/10 text-[#16E4B4] hover:bg-white/20">
+                <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full bg-white/10 text-primary hover:bg-white/20">
                     <HelpCircle className="h-6 w-6"/>
                 </Button>
            </div>
