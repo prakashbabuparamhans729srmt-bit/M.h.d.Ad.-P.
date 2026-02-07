@@ -1,91 +1,61 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Logo } from '@/components/shared/logo';
-import { Star, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Mail, Smartphone } from 'lucide-react';
+import { Logo } from '@/components/shared/logo';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-export default function WelcomePage() {
-  const goals = [
-    'बिल बनाना आसान करें',
-    'स्टॉक मैनेज करें',
-    'GST फाइलिंग सरल करें',
-    'बिक्री बढ़ाएं',
-  ];
-
-  const trustSignals = [
-    '100% मुफ्त ट्रायल',
-    'कोई क्रेडिट कार्ड नहीं',
-    '2 मिनट में सेटअप',
-  ];
+export default function NewEntryPage() {
+  const bgImage = PlaceHolderImages.find((img) => img.id === 'entry-background');
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 font-body animate-in fade-in-50 duration-500">
-      <main className="flex w-full max-w-md flex-col items-center text-center">
+    <div className="relative min-h-screen w-full overflow-hidden bg-background">
+      {bgImage && (
+        <div className="absolute inset-0 z-0 opacity-10">
+          <Image
+            src={bgImage.imageUrl}
+            alt={bgImage.description}
+            fill
+            className="object-cover"
+            data-ai-hint={bgImage.imageHint}
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+        </div>
+      )}
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center p-4 text-center">
         <div className="mb-8 animate-in fade-in-0 slide-in-from-top-5 duration-700">
           <Logo />
         </div>
-
-        <h1 className="mb-2 text-xl font-bold text-foreground animate-in fade-in-0 slide-in-from-top-5 delay-150 duration-700">
-          "छोटे व्यवसाय, बड़े सपने"
-        </h1>
-
-        <div className="mb-8 flex items-center gap-2 animate-in fade-in-0 slide-in-from-top-5 delay-300 duration-700">
-          <div className="flex text-yellow-400">
-            <Star className="h-5 w-5 fill-current" />
-            <Star className="h-5 w-5 fill-current" />
-            <Star className="h-5 w-5 fill-current" />
-            <Star className="h-5 w-5 fill-current" />
-            <Star className="h-5 w-5 fill-current" />
-          </div>
-          <span className="text-sm font-medium text-muted-foreground">4.8/5 (10,000+ रिव्यू)</span>
-        </div>
         
-        <Card className="w-full mb-8 text-left animate-in fade-in-0 slide-in-from-bottom-5 delay-400 duration-700">
-          <CardHeader>
-            <CardTitle className="text-center font-headline text-lg">🎯 क्या आप चाहते हैं?</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {goals.map((goal, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <Checkbox id={`goal-${index}`} className="border-primary" />
-                <Label htmlFor={`goal-${index}`} className="text-base text-foreground">
-                  {goal}
-                </Label>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-6xl font-headline animate-in fade-in-0 slide-in-from-top-10 delay-150 duration-700">
+          अपने व्यवसाय को नई ऊंचाइयों पर ले जाएं
+        </h1>
+        <p className="mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl animate-in fade-in-0 slide-in-from-top-10 delay-300 duration-700">
+          VyaparBandhu के साथ अपने व्यवसाय को सरल बनाएं, बिक्री बढ़ाएं और विकास को गति दें। आज ही शुरुआत करें।
+        </p>
 
-        <div className="w-full space-y-4 animate-in fade-in-0 slide-in-from-bottom-5 delay-500 duration-700">
-          <Button className="w-full h-12 text-lg ripple" asChild>
-            <Link href="/onboarding/business-type">मोबाइल नंबर से जारी रखें</Link>
+        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row animate-in fade-in-0 slide-in-from-bottom-10 delay-500 duration-700">
+          <Button size="lg" className="w-full sm:w-auto h-12 text-base" asChild>
+            <Link href="/login">
+              <Mail className="mr-2 h-5 w-5" />
+              ईमेल से साइन अप करें
+            </Link>
           </Button>
-          <div className="flex items-center gap-4">
-            <hr className="w-full border-border" />
-            <span className="text-sm text-muted-foreground">या</span>
-            <hr className="w-full border-border" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="w-full h-12 ripple">
-              गूगल से लॉगिन
-            </Button>
-            <Button variant="outline" className="w-full h-12 ripple">
-              फेसबुक से लॉगिन
-            </Button>
-          </div>
+          <span className="text-muted-foreground hidden sm:block">या</span>
+          <Button size="lg" variant="secondary" className="w-full sm:w-auto h-12 text-base" asChild>
+             <Link href="/login">
+              <Smartphone className="mr-2 h-5 w-5" />
+              मोबाइल से साइन अप करें
+            </Link>
+          </Button>
         </div>
 
-        <div className="mt-10 flex w-full justify-around text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-5 delay-600 duration-700">
-          {trustSignals.map((signal, index) => (
-            <div key={index} className="flex items-center gap-1.5">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <span>{signal}</span>
-            </div>
-          ))}
-        </div>
-      </main>
+         <p className="mt-8 text-sm text-muted-foreground animate-in fade-in-0 slide-in-from-bottom-10 delay-700 duration-700">
+          पहले से सदस्य हैं? <Link href="/login" className="font-semibold text-primary hover:underline">लॉग इन करें</Link>
+        </p>
+
+      </div>
     </div>
   );
 }

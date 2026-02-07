@@ -20,7 +20,7 @@ export default function BusinessTypeSelectionPage() {
     <div className="flex min-h-screen flex-col items-center bg-background p-4 font-body animate-in fade-in-50 duration-500">
         <div className="w-full max-w-md">
             <header className="relative flex items-center justify-center py-4">
-                <Link href="/" className="absolute left-0">
+                <Link href="/welcome" className="absolute left-0">
                     <Button variant="ghost" size="icon">
                         <ArrowLeft />
                     </Button>

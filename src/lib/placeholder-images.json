@@ -7,6 +7,12 @@
       "imageHint": "abstract network"
     },
     {
+      "id": "entry-background",
+      "description": "Abstract gradient background for the main entry page.",
+      "imageUrl": "https://images.unsplash.com/photo-1557682224-5b8590cd9ec5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhYnN0cmFjdCUyMGdyYWRpZW50fGVufDB8fHx8MTc2NjE3MDI5NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract gradient"
+    },
+    {
       "id": "avatar-1",
       "description": "Avatar of a smiling woman.",
       "imageUrl": "https://images.unsplash.com/photo-1557053910-d9eadeed1c58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2NjE4MTQ3NHww&ixlib=rb-4.1.0&q=80&w=1080",
