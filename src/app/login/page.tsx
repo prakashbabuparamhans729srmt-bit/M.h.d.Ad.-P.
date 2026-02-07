@@ -90,7 +90,7 @@ function AuthPageComponent() {
         const { email, password } = data as z.infer<typeof loginSchema>;
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        const { email, password, firstName, lastName } = data as z.infer<typeof registerSchema>;
+        const { email, password, firstName, lastName, phone } = data as z.infer<typeof registerSchema>;
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
         // After creating the user in Auth, create their profile in Firestore.
@@ -100,6 +100,7 @@ function AuthPageComponent() {
                 firstName,
                 lastName,
                 email: userCredential.user.email,
+                phone: phone || null,
                 role: 'Client' // Assign a default role
             };
             const userDocRef = doc(firestore, 'users', userCredential.user.uid);
@@ -303,10 +304,19 @@ function AuthPageComponent() {
             </Form>
 
             <div className="mt-6 text-center text-sm">
-                <span className="text-gray-400">{isLoginView ? 'अभी तक कोई खाता नहीं है? ' : 'पहले से ही एक खाता है? '}</span>
-                <button onClick={() => setIsLoginView(!isLoginView)} className="font-semibold text-primary hover:underline focus:outline-none">
-                  {isLoginView ? 'साइन अप करें' : 'लॉग इन करें'}
-                </button>
+                <p className="text-gray-400">{isLoginView ? 'अभी तक कोई खाता नहीं है? ' : 'पहले से ही एक खाता है? '}
+                    <button 
+                        onClick={() => {
+                            const newView = !isLoginView;
+                            setIsLoginView(newView);
+                            const newPath = `/login?view=${newView ? 'login' : 'signup'}`;
+                            window.history.pushState({}, '', newPath);
+                        }} 
+                        className="font-semibold text-primary hover:underline focus:outline-none"
+                    >
+                      {isLoginView ? 'साइन अप करें' : 'लॉग इन करें'}
+                    </button>
+                </p>
             </div>
            </div>
            <div className="absolute bottom-6 right-6">
